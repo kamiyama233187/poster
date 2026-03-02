@@ -10,19 +10,24 @@
 body {
   margin: 0;
   background: black;
+}
+.wrapper{
+  width: 210mm;
+  height: 297mm;
+  background: black;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 297mm;
 }
-img {
-  width: 210mm;
-  height: 297mm;
-  object-fit: cover;
+img{
+  max-width: 210mm;
+  max-height: 297mm;
 }
 </style>
 </head>
 <body>
-<img src="shukkin_quest_poster.png">
+<div class="wrapper">
+  <img src="shukkin_quest_poster.png">
+</div>
 </body>
 </html>
