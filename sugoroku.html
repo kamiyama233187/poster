@@ -109,11 +109,7 @@ button:active{
 
 const STORAGE_KEY = "shukkinQuestData_v3";
 
-const currentUser = localStorage.getItem("currentUserCode");
-
-
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-
 const currentUser = state.currentUser || null;
 
 if(!currentUser){
@@ -329,8 +325,6 @@ if(type === "rare"){
 
 }
 
-  save();
-}
 
 function showMessage(text){
 
