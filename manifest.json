@@ -1,7 +1,7 @@
 {
   "name": "出勤クエスト_dev",
   "short_name": "出勤クエスト",
-  "start_url": "/shukkinquestDQ_dev/?v=1.2.2",
+  "start_url": "/shukkinquestDQ_dev/?v=1.2.1",
   "scope": "/shukkinquestDQ_dev/",
   "display": "standalone",
   "background_color": "#000000",
