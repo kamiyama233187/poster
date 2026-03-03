@@ -345,6 +345,8 @@ function startMove(roll, emp, today){
 // 💀 HP0チェック
 if(state.sugoroku.hp <= 0){
 
+  clearInterval(moveInterval);
+
   showMessage("💀 力尽きた…拠点へ戻される");
 
   state.sugoroku.position = 0;
