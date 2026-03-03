@@ -7,6 +7,31 @@
 
 <style>
 
+.rareFlash {
+  animation: rareFlashAnim 0.6s ease-in-out 2;
+}
+
+@keyframes rareFlashAnim {
+  0%   { background:black; }
+  50%  { background:gold; }
+  100% { background:black; }
+}
+
+.bigMessage {
+  font-size:22px;
+  font-weight:bold;
+}
+
+.flash {
+  animation: flashAnim 0.4s ease-in-out 2;
+}
+
+@keyframes flashAnim {
+  0%   { background:white; color:black; }
+  50%  { background:gold; color:black; }
+  100% { background:white; color:black; }
+}
+
 .map{
   display:grid;
   grid-template-columns: repeat(6, 1fr);
@@ -122,6 +147,8 @@ const STORAGE_KEY = "shukkinQuestData_v3";
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 const currentUser = state.currentUser || null;
 
+let devMode = state.devMode || false;
+
 if(!currentUser){
   alert("ログインしてからプレイしてください");
   location.href = "index.html";
@@ -153,13 +180,40 @@ function todayStr(){
 function rollDice(){
 
   const today = todayStr();
+  const emp = state.employees[currentUser];
+  if(!emp) return;
 
- if(!devMode && state.sugoroku.lastPlayDate === today){
-  showMessage("今日はもうプレイできない！");
-  return;
+  if(!devMode && emp.sugorokuLastPlayDate === today){
+    showMessage("今日はもうプレイできない！");
+    return;
+  }
+
+  showMessage("🎲 サイコロを振った！");
+
+  let roll = 1;
+  let rollCount = 0;
+
+  const rollAnim = setInterval(()=>{
+
+    roll = Math.floor(Math.random()*6)+1;
+showMessage("🎲 ...");
+
+    rollCount++;
+
+ if(rollCount >= 10){
+  clearInterval(rollAnim);
+
+  showMessage("🎲 " + roll + " が出た！");
+
+  setTimeout(()=>{
+    startMove(roll, emp, today);
+  }, 600);
 }
 
-  const roll = Math.floor(Math.random()*6)+1;
+  }, 80);
+}
+
+function startMove(roll, emp, today){
 
   let steps = 0;
 
@@ -174,35 +228,30 @@ function rollDice(){
       state.sugoroku.position = 0;
       state.sugoroku.laps += 1;
 
-      // 🔥 従業員ごとの周回数も記録
-      if(currentUser && state.employees[currentUser]){
+      if(!emp.sugorokuLaps){
+        emp.sugorokuLaps = 0;
+      }
 
-        if(!state.employees[currentUser].sugorokuLaps){
-          state.employees[currentUser].sugorokuLaps = 0;
-        }
+      emp.sugorokuLaps += 1;
 
-        state.employees[currentUser].sugorokuLaps += 1;
+      // 🏆 1周
+      emp.totalPoints += 50;
+      emp.totalEarned += 50;
 
-        // 🏆 1周ボーナス
-        state.employees[currentUser].totalPoints += 50;
-        state.employees[currentUser].totalEarned += 50;
+      // 🌟 3周
+      if(emp.sugorokuLaps === 3 && !emp.sugorokuBonus3){
 
-        // 🌟 3周一度きりボーナス
-        if(state.sugoroku.laps === 3 && !state.sugoroku.bonus3Claimed){
+        emp.totalPoints += 100;
+        emp.totalEarned += 100;
 
-          state.employees[currentUser].totalPoints += 100;
-          state.employees[currentUser].totalEarned += 100;
+        emp.sugorokuBonus3 = true;
 
-          state.sugoroku.bonus3Claimed = true;
+        showMessage("🌟 3周達成！100ポイントボーナス！");
+      }
 
-          showMessage("🌟 3周達成！100ポイントボーナス！");
-        }
-
-        // 🔥 5周称号（安全）
-        if(state.employees[currentUser].sugorokuLaps === 5){
-          // giveTitle は index 側で判定するのが理想だが
-          // 念のためここでも呼べる構造にするなら削除可
-        }
+      // 🔥 5周称号
+      if(emp.sugorokuLaps === 5){
+        checkSugorokuTitles(currentUser);
       }
 
       showMessage("🏆 ゴール！1周達成！");
@@ -210,20 +259,33 @@ function rollDice(){
 
     render();
 
-    if(steps >= roll){
+ if(steps >= roll){
 
-      clearInterval(moveInterval);
+  clearInterval(moveInterval);
 
-      const tileType =
-        state.sugoroku.tiles[state.sugoroku.position];
+  render();
 
-      handleEvent(tileType);
+  const tiles = document.querySelectorAll(".tile");
+  const currentTile = tiles[state.sugoroku.position];
 
-      state.sugoroku.lastPlayDate = today;
-      save();
-    }
+  if(currentTile){
+    currentTile.classList.add("flash");
 
-  }, 250); // ← 速度（200〜300で調整可）
+    setTimeout(()=>{
+      currentTile.classList.remove("flash");
+    }, 800);
+  }
+
+  const tileType =
+    state.sugoroku.tiles[state.sugoroku.position];
+
+  handleEvent(tileType);
+
+  emp.sugorokuLastPlayDate = today;
+  save();
+}
+
+  }, 250);
 }
 
 function render(){
@@ -231,8 +293,10 @@ function render(){
   document.getElementById("pos").textContent =
     state.sugoroku.position;
 
-  document.getElementById("laps").textContent =
-    state.sugoroku.laps;
+  const emp = state.employees[currentUser];
+
+document.getElementById("laps").textContent =
+  emp.sugorokuLaps || 0;
 
   const map = document.getElementById("map");
   map.innerHTML = "";
@@ -268,12 +332,16 @@ function render(){
       tile.textContent = i;
     }
 
-if(devMode){
-  document.getElementById("devTools").style.display = "block";
-}
-
     map.appendChild(tile);
   }
+}
+
+const tools = document.getElementById("devTools");
+
+if(devMode){
+  tools.style.display = "block";
+}else{
+  tools.style.display = "none";
 }
 
 
@@ -351,7 +419,7 @@ if(type === "rare"){
 
       save();
 
-      showMessage("🌟🌟 超レア発動！100ポイント獲得！！");
+      showMessage("🌟🌟 超レア発動！100ポイント獲得！！", "rare");
 
     }else{
 
@@ -361,7 +429,7 @@ if(type === "rare"){
 
       save();
 
-      showMessage("⭐ レアマス！30ポイント獲得！");
+      showMessage("⭐ レアマス！30ポイント獲得！", "rare");
     }
   }
 }
@@ -369,28 +437,27 @@ if(type === "rare"){
 }
 
 
-function showMessage(text){
+function showMessage(text, type="normal"){
 
   const box = document.getElementById("dqMessage");
 
   box.innerHTML = text;
   box.style.display = "block";
 
+  box.classList.remove("bigMessage");
+
+  if(type === "rare"){
+    box.classList.add("bigMessage");
+    document.body.classList.add("rareFlash");
+
+    setTimeout(()=>{
+      document.body.classList.remove("rareFlash");
+    },800);
+  }
+
   setTimeout(()=>{
     box.style.display = "none";
-  },2000);
-}
-
-function checkSugorokuTitles(code){
-
-  const emp = state.employees[code];
-  if(!emp) return;
-
-  const laps = emp.sugorokuLaps || 0;
-
-  if(laps >= 5){
-    giveTitle(code, "sugoroku5");
-  }
+  },2500);
 }
 
 function devRoll(){
@@ -424,8 +491,13 @@ function warpTo(num){
   save();
 }
 
-generateMap();
+if(!state.sugoroku.tiles || state.sugoroku.tiles.length === 0){
+  generateMap();
+  save();
+}
+
 render();
+
 </script>
 </body>
 </html>

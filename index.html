@@ -990,11 +990,21 @@ function login(){
 
   const code = document.getElementById("loginCode").value.trim();
 if(code === "12231489"){
-  devMode = true;
+  state.devMode = true;
   showDQMessage("🛠 開発者モード ON");
   document.getElementById("loginCode").value="";
   return;
 }
+
+// 🛠 開発者モード OFF
+  if(code === "14891223"){
+    state.devMode = false;
+    save();
+    showDQMessage("🛠 開発者モード OFF");
+    document.getElementById("loginCode").value="";
+    return;
+  }
+
   if(!code){
   showDQMessage("コードを いれてください！");
   return;
