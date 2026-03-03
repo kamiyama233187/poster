@@ -558,6 +558,29 @@ if(!state.sugoroku.tiles || state.sugoroku.tiles.length === 0){
 
 render();
 
+
+ // バージョン
+const version = localStorage.getItem("appVersion");
+
+if(version){
+  document.getElementById("versionDisplay").textContent =
+    "v" + version;
+}else{
+  document.getElementById("versionDisplay").textContent =
+    "v?";
+}
+
+
 </script>
+
+<div id="versionDisplay"
+     style="position:fixed;
+            bottom:8px;
+            right:12px;
+            font-size:11px;
+            opacity:0.6;
+            pointer-events:none;">
+</div>　
+
 </body>
 </html>
