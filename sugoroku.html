@@ -95,6 +95,8 @@ button:active{
 
 </div>
 
+<div id="dqMessage" class="window center" style="display:none;"></div>
+
 <div class="center">
   <button onclick="location.href='index.html'">
     もどる
@@ -107,7 +109,17 @@ button:active{
 
 const STORAGE_KEY = "shukkinQuestData_v3";
 
+const currentUser = localStorage.getItem("currentUserCode");
+
+
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+const currentUser = state.currentUser || null;
+
+if(!currentUser){
+  alert("ログインしてからプレイしてください");
+  location.href = "index.html";
+}
 
 if(!state.sugoroku){
   state.sugoroku = {
@@ -115,7 +127,8 @@ if(!state.sugoroku){
     stage: 1,
     laps: 0,
     lastPlayDate: null,
-    tiles: []
+    tiles: [],
+bonus3Claimed: false
   };
   generateMap();
   save();
@@ -148,11 +161,30 @@ const tileType =
   state.sugoroku.tiles[state.sugoroku.position];
 handleEvent(tileType);
 
-  if(state.sugoroku.position >= 30){
-    state.sugoroku.position = 0;
-    state.sugoroku.laps += 1;
-    alert("ゴール！称号報酬予定！");
+if(state.sugoroku.position >= 30){
+
+  state.sugoroku.position = 0;
+  state.sugoroku.laps += 1;
+
+  if(currentUser && state.employees[currentUser]){
+
+    // 1周ボーナス
+    state.employees[currentUser].totalPoints += 50;
+    state.employees[currentUser].totalEarned += 50;
+
+    // 🔥 3周ボーナス
+    if(state.sugoroku.laps === 3 && !state.sugoroku.bonus3Claimed){
+      state.employees[currentUser].totalPoints += 100;
+      state.employees[currentUser].totalEarned += 100;
+
+state.sugoroku.bonus3Claimed = true;
+
+      showMessage("🌟 3周達成！100ポイントボーナス！");
+    }
   }
+
+  showMessage("🏆 ゴール！1周達成！");
+}
 
   state.sugoroku.lastPlayDate = today;
 
@@ -236,18 +268,80 @@ function generateMap(){
 
 function handleEvent(type){
 
-  if(type === "plus"){
-    alert("💰 10ポイント獲得！");
+  if(!currentUser || !state.employees[currentUser]){
+    alert("ログイン情報がありません");
+    return;
   }
 
-  if(type === "minus"){
-    alert("❌ 5ポイント失った！");
+  const emp = state.employees[currentUser];
+
+if(type === "plus"){
+
+  state.employees[currentUser].totalPoints += 10;
+  state.employees[currentUser].totalEarned += 10;
+
+  save();
+
+  showMessage("💰 10ポイント獲得！");
+}
+
+if(type === "minus"){
+
+  state.employees[currentUser].totalPoints -= 5;
+
+  if(state.employees[currentUser].totalPoints < 0){
+    state.employees[currentUser].totalPoints = 0;
   }
 
-  if(type === "rare"){
-    alert("⭐ レアマス！ボーナス予定！");
-  }
+  save();
 
+  showMessage("❌ 5ポイント失った！");
+}
+
+if(type === "rare"){
+
+  if(currentUser && state.employees[currentUser]){
+
+    const chance = Math.random();
+
+    if(chance < 0.2){
+
+      // 🔥 超ボーナス
+      state.employees[currentUser].totalPoints += 100;
+      state.employees[currentUser].totalEarned += 100;
+
+      save();
+
+      showMessage("🌟🌟 超レア発動！100ポイント獲得！！");
+
+    }else{
+
+      // 通常レア
+      state.employees[currentUser].totalPoints += 30;
+      state.employees[currentUser].totalEarned += 30;
+
+      save();
+
+      showMessage("⭐ レアマス！30ポイント獲得！");
+    }
+  }
+}
+
+}
+
+  save();
+}
+
+function showMessage(text){
+
+  const box = document.getElementById("dqMessage");
+
+  box.innerHTML = text;
+  box.style.display = "block";
+
+  setTimeout(()=>{
+    box.style.display = "none";
+  },2000);
 }
 
 generateMap();

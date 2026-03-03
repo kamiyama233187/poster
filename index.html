@@ -953,8 +953,14 @@ if(!state.employees[code]){
   showDQMessage("その ぼうけんしゃは いません！");
 return;
 }
+
   currentUser = code;
   isAdmin = false;
+
+state.currentUser = code;
+save();
+
+localStorage.setItem("currentUserCode", code);
 
   ensureTodayRecord(code);
 
@@ -993,6 +999,9 @@ if(now.getHours() === 7 && now.getMinutes() === 0){
 function logout(){
   currentUser=null;
   isAdmin=false;
+
+localStorage.removeItem("currentUserCode");
+
   document.getElementById("loginCode").value="";
   show("viewLogin");
 }
@@ -1895,12 +1904,14 @@ function renderRanking(){
 
   container.innerHTML="";
 
-  const arr = Object.entries(state.employees)
-    .map(([code,emp])=>({
-      code,
-      name:emp.name,
-      pt:emp.totalPoints||0
-    }))
+const arr = Object.entries(state.employees)
+  .map(([code,emp])=>({
+    code,
+    name:emp.name,
+    pt:emp.totalPoints||0,
+    laps: state.sugoroku?.laps || 0
+  }))
+
     .sort((a,b)=>b.pt-a.pt)
     .slice(0,3);
 
@@ -1944,6 +1955,9 @@ row.innerHTML = `
       【${titleText}】
     </div>
     <span class="badge">${e.pt}pt</span>
+<div style="font-size:12px;">
+  🎲 ${e.laps}周
+</div>
   </div>
 `;
 
