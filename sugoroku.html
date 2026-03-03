@@ -207,6 +207,7 @@ button:active{
 <button onclick="devHp(10)">❤️ HP +10</button>
 <button onclick="devHp(-10)">💔 HP -10</button>
 <button onclick="devFullHp()">💯 HP全回復</button>
+<button onclick="regenerateMap()">🗺 マップ再生成</button>
 
 <div class="center">
   <button onclick="location.href='index.html'">
@@ -318,6 +319,14 @@ function startMove(roll, emp, today){
       // 🏆 1周
       emp.totalPoints += 50;
       emp.totalEarned += 50;
+
+// ❤️ HP回復
+state.sugoroku.hp += 20;
+if(state.sugoroku.hp > state.sugoroku.maxHp){
+  state.sugoroku.hp = state.sugoroku.maxHp;
+}
+
+showMessage("❤️ HPが20回復した！");
 
       // 🌟 3周
       if(emp.sugorokuLaps === 3 && !emp.sugorokuBonus3){
@@ -478,6 +487,9 @@ else if(rand < 0.33){
 }
 else if(rand < 0.38){
   state.sugoroku.tiles.push("boss"); // ←追加
+}
+else if(rand < 0.38){
+  state.sugoroku.tiles.push("heal"); // ←追加
 }
 else{
   state.sugoroku.tiles.push("none");
@@ -702,6 +714,18 @@ function devFullHp(){
   state.sugoroku.hp = state.sugoroku.maxHp;
   render();
   save();
+}
+
+function regenerateMap(){
+
+  generateMap();
+
+  state.sugoroku.position = 0;
+
+  showMessage("🗺 マップを再生成した！");
+
+  save();
+  render();
 }
 
  // バージョン
