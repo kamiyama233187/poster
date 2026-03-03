@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1.2.2";   // ← 更新ごとに上げる
+const CACHE_VERSION = "v1.2.1";   // ← 更新ごとに上げる
 const CACHE_NAME = "shukkin-quest-dev-1 + CACHE_VERSION;
 
 const FILES_TO_CACHE = [
@@ -51,4 +51,5 @@ self.addEventListener("fetch", event => {
       })
       .catch(() => caches.match(event.request))
   );
+
 });
