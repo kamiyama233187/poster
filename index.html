@@ -996,6 +996,7 @@ function login(){
   const code = document.getElementById("loginCode").value.trim();
 if(code === "12231489"){
   state.devMode = true;
+save();
   showDQMessage("🛠 開発者モード ON");
   document.getElementById("loginCode").value="";
   return;
@@ -2253,7 +2254,7 @@ row.appendChild(equipBtn);
   }
 
   // ===== 開発者モード =====
-  if(devMode){
+  if(state.devMode){
 
     const devBox = document.createElement("div");
     devBox.style.marginTop = "12px";
