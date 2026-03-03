@@ -6,6 +6,30 @@
 <title>すごろく</title>
 
 <style>
+
+.map{
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:5px;
+  margin-top:10px;
+}
+
+.tile{
+  border:1px solid white;
+  padding:8px 0;
+  text-align:center;
+  font-size:12px;
+}
+
+.active{
+  background:white;
+  color:black;
+}
+
+.goal{
+  border:2px solid gold;
+}
+
 body{
   margin:0;
   background:black;
@@ -61,7 +85,14 @@ button:active{
 </div>
 
 <div class="window center">
-  ⚔️ すごろくは現在開発中です。
+  現在位置：<span id="pos">0</span> マス<br>
+
+  周回数：<span id="laps">0</span><br><br>
+
+  <button onclick="rollDice()">サイコロを振る</button>
+
+<div id="map" class="map"></div>
+
 </div>
 
 <div class="center">
@@ -72,5 +103,151 @@ button:active{
 
 </div>
 
+<script>
+
+const STORAGE_KEY = "shukkinQuestData_v3";
+
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+if(!state.sugoroku){
+  state.sugoroku = {
+    position: 0,
+    stage: 1,
+    laps: 0,
+    lastPlayDate: null,
+    tiles: []
+  };
+  generateMap();
+  save();
+}
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function todayStr(){
+  const d = new Date();
+  if(d.getHours() < 7) d.setDate(d.getDate()-1);
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+
+function rollDice(){
+
+  const today = todayStr();
+
+  if(state.sugoroku.lastPlayDate === today){
+    alert("今日はもうプレイできない！");
+    return;
+  }
+
+  const roll = Math.floor(Math.random()*6)+1;
+
+  state.sugoroku.position += roll;
+
+const tileType =
+  state.sugoroku.tiles[state.sugoroku.position];
+handleEvent(tileType);
+
+  if(state.sugoroku.position >= 30){
+    state.sugoroku.position = 0;
+    state.sugoroku.laps += 1;
+    alert("ゴール！称号報酬予定！");
+  }
+
+  state.sugoroku.lastPlayDate = today;
+
+  save();
+  render();
+}
+
+function render(){
+
+  document.getElementById("pos").textContent =
+    state.sugoroku.position;
+
+  document.getElementById("laps").textContent =
+    state.sugoroku.laps;
+
+  const map = document.getElementById("map");
+  map.innerHTML = "";
+
+  for(let i=0;i<30;i++){
+
+    const tile = document.createElement("div");
+    tile.className = "tile";
+
+    if(i === state.sugoroku.position){
+      tile.classList.add("active");
+    }
+
+    if(i === 29){
+      tile.classList.add("goal");
+    }
+
+    // 👇 ここがイベント表示部分
+    const type = state.sugoroku.tiles[i];
+
+    if(i === 29){
+      tile.textContent = "G";
+    }
+    else if(type === "plus"){
+      tile.textContent = "+";
+    }
+    else if(type === "minus"){
+      tile.textContent = "-";
+    }
+    else if(type === "rare"){
+      tile.textContent = "★";
+    }
+    else{
+      tile
+
+render();
+
+function generateMap(){
+
+  state.sugoroku.tiles = [];
+
+  for(let i=0;i<30;i++){
+
+    if(i === 29){
+      state.sugoroku.tiles.push("goal");
+      continue;
+    }
+
+    const rand = Math.random();
+
+    if(rand < 0.2){
+      state.sugoroku.tiles.push("plus");
+    }
+    else if(rand < 0.3){
+      state.sugoroku.tiles.push("minus");
+    }
+    else if(rand < 0.35){
+      state.sugoroku.tiles.push("rare");
+    }
+    else{
+      state.sugoroku.tiles.push("none");
+    }
+  }
+}
+
+function handleEvent(type){
+
+  if(type === "plus"){
+    alert("💰 10ポイント獲得！");
+  }
+
+  if(type === "minus"){
+    alert("❌ 5ポイント失った！");
+  }
+
+  if(type === "rare"){
+    alert("⭐ レアマス！ボーナス予定！");
+  }
+
+}
+
+</script>
 </body>
 </html>
