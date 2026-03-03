@@ -204,6 +204,9 @@ button:active{
 <button onclick="devTrigger('rare')">レア</button>
 <button onclick="devTrigger('boss')">ボス</button>
 <button onclick="devTrigger('goal')">ゴール</button>
+<button onclick="devHp(10)">❤️ HP +10</button>
+<button onclick="devHp(-10)">💔 HP -10</button>
+<button onclick="devFullHp()">💯 HP全回復</button>
 
 <div class="center">
   <button onclick="location.href='index.html'">
@@ -682,6 +685,28 @@ function devTrigger(type){
   }
 
   handleEvent(type);
+}
+
+function devHp(amount){
+
+  state.sugoroku.hp += amount;
+
+  if(state.sugoroku.hp > state.sugoroku.maxHp){
+    state.sugoroku.hp = state.sugoroku.maxHp;
+  }
+
+  if(state.sugoroku.hp < 0){
+    state.sugoroku.hp = 0;
+  }
+
+  render();
+  save();
+}
+
+function devFullHp(){
+  state.sugoroku.hp = state.sugoroku.maxHp;
+  render();
+  save();
 }
 
  // バージョン
