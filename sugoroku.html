@@ -274,29 +274,24 @@ function rollDice(){
     return;
   }
 
-  showMessage("🎲 サイコロを振った！");
+  // ① 振った表示（即消える）
+  const box = document.getElementById("dqMessage");
+  box.innerHTML = "🎲 サイコロを振った！";
+  box.style.display = "block";
 
-  let roll = 1;
-  let rollCount = 0;
+  const roll = Math.floor(Math.random()*6)+1;
 
-  const rollAnim = setInterval(()=>{
-
-    roll = Math.floor(Math.random()*6)+1;
-showMessage("🎲 ...");
-
-    rollCount++;
-
- if(rollCount >= 10){
-  clearInterval(rollAnim);
-
-  showMessage("🎲 " + roll + " が出た！");
-
+  // ② 少し待って結果表示
   setTimeout(()=>{
-    startMove(roll, emp, today);
-  }, 600);
-}
 
-  }, 80);
+    showMessage("🎲 " + roll + " が出た！");
+
+    // ③ 結果メッセージが終わったら移動
+    setTimeout(()=>{
+      startMove(roll, emp, today);
+    }, 800);  // ←ここが“間”
+
+  }, 300);
 }
 
 function startMove(roll, emp, today){
