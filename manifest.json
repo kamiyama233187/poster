@@ -1,6 +1,6 @@
 {
-  "name": "出勤クエスト",
-  "short_name": "出勤クエスト",
+  "name": "出勤クエスト_dev",
+  "short_name": "出勤クエスト_dev",
   "start_url": "/shukkin-questDQ/",
   "scope": "/shukkin-questDQ/",
   "display": "standalone",
