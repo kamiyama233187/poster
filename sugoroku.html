@@ -526,6 +526,9 @@ document.getElementById("laps").textContent =
 else if(type === "boss"){
   tile.textContent = "⚔";
 }
+else if(type === "branch"){
+  tile.textContent = "↔";
+}
 else if(type === "exit"){
   tile.textContent = "🚪";
 }
@@ -569,11 +572,29 @@ if(devMode){
 
 function generateMap(){
 
+const rate = {
+ plus:0.18,
+ minus:0.1,
+ rare:0.05,
+ heal:0.05,
+ boss:0.05,
+ cave:0.04
+};
+
 const stage = state.sugoroku.stage;
 
   state.sugoroku.tiles = [];
 
   for(let i=0;i<30;i++){
+
+// 分岐テストマス
+if(i === 10){
+  state.sugoroku.tiles.push({
+    type:"branch",
+    next:[11,15]
+  });
+  continue;
+}
 
     if(i === 29){
       state.sugoroku.tiles.push("goal");
@@ -584,25 +605,45 @@ const rand = Math.random();
 const rate = STAGE_TILE_RATE[stage];
 
 if(rand < rate.plus){
-  state.sugoroku.tiles.push("plus");
+  state.sugoroku.tiles.push({
+  type:"plus",
+  next:[i+1]
+});
 }
 else if(rand < rate.plus + rate.minus){
-  state.sugoroku.tiles.push("minus");
+  state.sugoroku.tiles.push({
+  type:"minus",
+  next:[i+1]
+});
 }
 else if(rand < rate.plus + rate.minus + rate.rare){
-  state.sugoroku.tiles.push("rare");
+  state.sugoroku.tiles.push({
+  type:"rare",
+  next:[i+1]
+});
 }
 else if(rand < rate.plus + rate.minus + rate.rare + rate.heal){
-  state.sugoroku.tiles.push("heal");
+  state.sugoroku.tiles.push({
+  type:"heal",
+  next:[i+1]
+});
 }
 else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss){
-  state.sugoroku.tiles.push("boss");
+  state.sugoroku.tiles.push({
+  type:"boss",
+  next:[i+1]
+});
 }
-else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss + 0.05){
-  state.sugoroku.tiles.push("cave");
-}
+else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss + rate.cave){
+  state.sugoroku.tiles.push({
+    type:"cave",
+    next:[i+1]
+  });
 else{
-  state.sugoroku.tiles.push("none");
+  state.sugoroku.tiles.push({
+  type:"none",
+  next:[i+1]
+});
 }
   }
 }
