@@ -163,7 +163,8 @@ button:active{
 
 Lv：<span id="level">1</span><br>
 所持ポイント：<span id="points">0</span> pt<br>
-経験値：<span id="xp">0</span><br><br>
+経験値：<span id="xp">0</span><br>
+次のレベルまで：<span id="nextXp">0</span> XP<br><br>
 
 現在位置：<span id="pos">0</span> マス<br>
 周回数：<span id="laps">0</span><br><br>
@@ -432,6 +433,9 @@ document.getElementById("stageNum").textContent =
 
   const emp = state.employees[currentUser];
 
+const earned = emp.totalEarned || 0;
+
+const levelData = getLevelInfo(earned);
 document.getElementById("xp").textContent =
   emp.totalEarned || 0;
 const levelData = getLevelInfo(emp.totalEarned || 0);
@@ -439,6 +443,20 @@ document.getElementById("level").textContent =
   levelData.level;
 document.getElementById("points").textContent =
   emp.totalPoints || 0;
+const nextReq = getNextLevelRequirement(earned);
+
+if(nextReq){
+
+  const remain = nextReq - earned;
+
+  document.getElementById("nextXp").textContent =
+    remain;
+
+}else{
+
+  document.getElementById("nextXp").textContent =
+    "MAX";
+}
 
 document.getElementById("laps").textContent =
   emp.sugorokuLaps || 0;
@@ -792,15 +810,34 @@ function regenerateMap(){
   render();
 }
 
-function getLevelInfo(xp){
-
-  const level = Math.floor(xp / 100) + 1;
-
-  return {
-    level: level
-  };
-
+function getRequiredExp(level){
+  return level * level * 10;
 }
+
+function getLevelInfo(total){
+
+  let level = 1;
+
+  for(let i=1;i<=99;i++){
+    if(total >= getRequiredExp(i)){
+      level = i;
+    }else{
+      break;
+    }
+  }
+
+  return { level: level };
+}
+
+function getNextLevelRequirement(total){
+
+  const info = getLevelInfo(total);
+
+  if(info.level >= 99) return null;
+
+  return getRequiredExp(info.level + 1);
+}
+
 
  // バージョン
 const version = localStorage.getItem("appVersion");
