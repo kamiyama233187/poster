@@ -844,6 +844,7 @@ render();
   },1000);
 
 }
+
 if(type === "branch"){
 
   currentBranch = state.sugoroku.tiles[state.sugoroku.position];
@@ -852,7 +853,6 @@ if(type === "branch"){
 
 }
 
-  const choice = confirm("分かれ道だ！みぎへすすむ？");
 
   if(choice){
     state.sugoroku.position = 15;
