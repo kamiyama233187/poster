@@ -160,9 +160,13 @@ button:active{
 
 <div class="window center">
 ステージ：<span id="stageNum">1</span><br>
-  現在位置：<span id="pos">0</span> マス<br>
 
-  周回数：<span id="laps">0</span><br><br>
+Lv：<span id="level">1</span><br>
+所持ポイント：<span id="points">0</span> pt<br>
+経験値：<span id="xp">0</span><br><br>
+
+現在位置：<span id="pos">0</span> マス<br>
+周回数：<span id="laps">0</span><br><br>
 
 <div style="margin-top:10px;">
   HP
@@ -427,6 +431,17 @@ document.getElementById("stageNum").textContent =
     state.sugoroku.position;
 
   const emp = state.employees[currentUser];
+
+document.getElementById("points").textContent =
+  emp.totalPoints || 0;
+
+document.getElementById("xp").textContent =
+  emp.totalEarned || 0;
+const levelData = getLevelInfo(emp.totalEarned || 0);
+document.getElementById("level").textContent =
+  levelData.level;
+document.getElementById("points").textContent =
+  emp.totalPoints || 0;
 
 document.getElementById("laps").textContent =
   emp.sugorokuLaps || 0;
