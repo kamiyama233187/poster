@@ -623,6 +623,33 @@ tile.style.left = tileData.x * 60 + "px";
 tile.style.top = tileData.y * 60 + "px";
 
     map.appendChild(tile);
+if(i > 0){
+
+  const prev = state.sugoroku.tiles[i-1];
+
+  const x1 = prev.x * 60 + 20;
+  const y1 = prev.y * 60 + 20;
+
+  const x2 = tileData.x * 60 + 20;
+  const y2 = tileData.y * 60 + 20;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  const length = Math.sqrt(dx*dx + dy*dy);
+
+  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+  const path = document.createElement("div");
+  path.className = "path";
+
+  path.style.left = x1 + "px";
+  path.style.top = y1 + "px";
+  path.style.width = length + "px";
+  path.style.transform = `rotate(${angle}deg)`;
+
+  map.appendChild(path);
+}
   }
 
 const mapLayer = document.getElementById("mapLayer");
@@ -666,6 +693,7 @@ const y = tileData.y * 60;
   player.textContent = state.player.avatar;
 
 }
+drawMiniMap();
 }
 const tools = document.getElementById("devTools");
 
@@ -673,8 +701,6 @@ if(devMode){
   tools.style.display = "block";
 }else{
   tools.style.display = "none";
-
-drawMiniMap();
 }
 
 
