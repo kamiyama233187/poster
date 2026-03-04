@@ -7,6 +7,16 @@
 
 <style>
 
+#miniMapBox{
+  margin-top:10px;
+  text-align:center;
+}
+
+#miniMap{
+  border:1px solid white;
+  background:black;
+}
+
 .bossFlashWin {
   animation: bossWinAnim 0.5s ease-in-out 2;
 }
@@ -83,11 +93,11 @@
 
 .tile{
   position:absolute;
-  width:40px;
-  height:40px;
+  width:44px;
+  height:44px;
   border:1px solid white;
   text-align:center;
-  line-height:40px;
+  line-height:44px;
   font-size:12px;
 }
 
@@ -170,6 +180,9 @@ button:active{
 </div>
 
 <div class="window center">
+<div id="miniMapBox">
+  <canvas id="miniMap" width="200" height="60"></canvas>
+</div>
 ステージ：<span id="stageNum">1</span><br>
 
 Lv：<span id="level">1</span><br>
@@ -660,13 +673,17 @@ if(devMode){
   tools.style.display = "block";
 }else{
   tools.style.display = "none";
+
+drawMiniMap();
 }
 
 
 
 function generateMap(){
 
+
 const stage = state.sugoroku.stage;
+const branchChance = 0.12;
 
   state.sugoroku.tiles = [];
 
@@ -680,16 +697,7 @@ x += 1;
 if(Math.random() < 0.35){
   y += 1;
 }
-// 分岐テストマス
-if(i === 10){
-  state.sugoroku.tiles.push({
-    type:"branch",
-    next:[11,15],
-x:x,
-    y:y
-  });
-  continue;
-}
+
 
     if(i === length - 1){
   state.sugoroku.tiles.push({
@@ -697,6 +705,28 @@ x:x,
   x:x,
   y:y
 });
+  continue;
+}
+
+if(Math.random() < branchChance && i > 5 && i < length-6){
+
+  const branchY = y + 1;
+
+  state.sugoroku.tiles.push({
+    type:"branch",
+    next:[i+1, i+3],
+    x:x,
+    y:y
+  });
+
+  // 分岐ルート
+  state.sugoroku.tiles.push({
+    type:"none",
+    next:[i+2],
+    x:x+1,
+    y:branchY
+  });
+
   continue;
 }
 
@@ -1228,6 +1258,46 @@ function changeAvatar(icon){
 
   save();
   render();
+
+}
+
+function drawMiniMap(){
+
+  const canvas = document.getElementById("miniMap");
+  if(!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const tiles = state.sugoroku.tiles;
+
+  if(!tiles || tiles.length === 0) return;
+
+  const scale = 4;
+
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+
+  for(let i=1;i<tiles.length;i++){
+
+    const a = tiles[i-1];
+    const b = tiles[i];
+
+    ctx.beginPath();
+    ctx.moveTo(a.x*scale+10, a.y*scale+10);
+    ctx.lineTo(b.x*scale+10, b.y*scale+10);
+    ctx.stroke();
+
+  }
+
+  // プレイヤー
+  const p = tiles[state.sugoroku.position];
+
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.arc(p.x*scale+10, p.y*scale+10, 3, 0, Math.PI*2);
+  ctx.fill();
 
 }
 
