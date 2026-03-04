@@ -436,13 +436,16 @@ document.getElementById("stageNum").textContent =
 const earned = emp.totalEarned || 0;
 
 const levelData = getLevelInfo(earned);
+
 document.getElementById("xp").textContent =
-  emp.totalEarned || 0;
-const levelData = getLevelInfo(emp.totalEarned || 0);
+  earned;
+
 document.getElementById("level").textContent =
   levelData.level;
+
 document.getElementById("points").textContent =
   emp.totalPoints || 0;
+
 const nextReq = getNextLevelRequirement(earned);
 
 if(nextReq){
