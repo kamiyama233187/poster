@@ -266,6 +266,12 @@ const STAGE_DATA = {
   }
 };
 
+const STAGE_MAP_LENGTH = {
+  1:30,
+  2:40,
+  3:50
+};
+
 const STAGE_TILE_RATE = {
   1: {
     plus:0.20,
@@ -371,11 +377,19 @@ function startMove(roll, emp, today){
 
   const moveInterval = setInterval(()=>{
 
-    state.sugoroku.position += 1;
+    const tile = state.sugoroku.tiles[state.sugoroku.position];
+
+if(tile && tile.next){
+  state.sugoroku.position = tile.next[0];
+}else{
+  state.sugoroku.position += 1;
+}
     steps++;
 
     // 🎯 ゴール処理
-    if(state.sugoroku.position >= 30){
+    const length = STAGE_MAP_LENGTH[state.sugoroku.stage];
+
+if(state.sugoroku.position >= length){
       state.sugoroku.position = 0;
       state.sugoroku.laps += 1;
 state.sugoroku.stage += 1;
@@ -513,7 +527,9 @@ document.getElementById("laps").textContent =
   const map = document.getElementById("map");
   map.innerHTML = "";
 
-  for(let i=0;i<30;i++){
+const length = state.sugoroku.tiles.length;
+
+for(let i=0;i<length;i++)
 
     const tile = document.createElement("div");
     tile.className = "tile";
@@ -522,7 +538,7 @@ document.getElementById("laps").textContent =
       tile.classList.add("active");
     }
 
-    if(i === 29){
+    if(i === state.sugoroku.tiles.length - 1){
       tile.classList.add("goal");
     }
 
@@ -593,7 +609,9 @@ const stage = state.sugoroku.stage;
 
   state.sugoroku.tiles = [];
 
-  for(let i=0;i<30;i++){
+ const length = STAGE_MAP_LENGTH[stage];
+
+for(let i=0;i<length;i++)
 
 // 分岐テストマス
 if(i === 10){
