@@ -248,6 +248,30 @@ const STAGE_DATA = {
   }
 };
 
+const STAGE_TILE_RATE = {
+  1: {
+    plus: 0.20,
+    minus: 0.08,
+    rare: 0.07,
+    heal: 0.10,
+    boss: 0.05
+  },
+  2: {
+    plus: 0.15,
+    minus: 0.12,
+    rare: 0.07,
+    heal: 0.06,
+    boss: 0.08
+  },
+  3: {
+    plus: 0.10,
+    minus: 0.18,
+    rare: 0.05,
+    heal: 0.03,
+    boss: 0.12
+  }
+};
+
 let devMode = state.devMode || false;
 
 let messageQueue = [];
@@ -529,6 +553,8 @@ if(devMode){
 
 function generateMap(){
 
+const stage = state.sugoroku.stage;
+
   state.sugoroku.tiles = [];
 
   for(let i=0;i<30;i++){
@@ -538,21 +564,22 @@ function generateMap(){
       continue;
     }
 
-    const rand = Math.random();
+const rand = Math.random();
+const rate = STAGE_TILE_RATE[stage];
 
-if(rand < 0.18){
+if(rand < rate.plus){
   state.sugoroku.tiles.push("plus");
 }
-else if(rand < 0.28){
+else if(rand < rate.plus + rate.minus){
   state.sugoroku.tiles.push("minus");
 }
-else if(rand < 0.33){
+else if(rand < rate.plus + rate.minus + rate.rare){
   state.sugoroku.tiles.push("rare");
 }
-else if(rand < 0.38){
+else if(rand < rate.plus + rate.minus + rate.rare + rate.heal){
   state.sugoroku.tiles.push("heal");
 }
-else if(rand < 0.43){
+else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss){
   state.sugoroku.tiles.push("boss");
 }
 else{
