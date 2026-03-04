@@ -100,6 +100,7 @@
   line-height:44px;
   font-size:12px;
   z-index:1;
+background:black;
 }
 
 .path{
@@ -634,11 +635,11 @@ if(i > 0){
 
   const prev = state.sugoroku.tiles[i-1];
 
-  const x1 = prev.x * 60 + 20;
-  const y1 = prev.y * 60 + 20;
+  const x1 = prev.x * 60 + 22;
+  const y1 = prev.y * 60 + 22;
 
-  const x2 = tileData.x * 60 + 20;
-  const y2 = tileData.y * 60 + 20;
+  const x2 = tileData.x * 60 + 22;
+  const y2 = tileData.y * 60 + 22;
 
   const dx = x2 - x1;
   const dy = y2 - y1;
