@@ -360,6 +360,11 @@ function todayStr(){
 
 function rollDice(){
 
+  if(currentBranch){
+    showMessage("分かれ道を選んでください！");
+    return;
+  }
+
   const today = todayStr();
   const emp = state.employees[currentUser];
   if(!emp) return;
@@ -397,7 +402,7 @@ function startMove(roll, emp, today){
 
     const tile = state.sugoroku.tiles[state.sugoroku.position];
 
-if(tile && tile.next){
+if(tile && tile.type !== "branch" && tile.next){
   state.sugoroku.position = tile.next[0];
 }else{
   state.sugoroku.position += 1;
@@ -405,7 +410,7 @@ if(tile && tile.next){
     steps++;
 
     // 🎯 ゴール処理
-    const length = STAGE_MAP_LENGTH[state.sugoroku.stage];
+    const length = state.sugoroku.tiles.length;
 
 if(state.sugoroku.position >= length){
       state.sugoroku.position = 0;
