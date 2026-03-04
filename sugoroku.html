@@ -7,15 +7,6 @@
 
 <style>
 
-.walk{
-  animation: walkAnim 0.2s infinite alternate;
-}
-
-@keyframes walkAnim{
-  from{ transform:translateY(0px); }
-  to{ transform:translateY(-2px); }
-}
-
 #mapLayer{
   transition: transform 0.25s linear;
 }
@@ -86,13 +77,23 @@
 }
 
 .flash {
-  animation: flashAnim 0.4s ease-in-out 2;
+  animation: flashAnim 0.35s ease-in-out 2;
 }
 
 @keyframes flashAnim {
-  0%   { background:white; color:black; }
-  50%  { background:gold; color:black; }
-  100% { background:white; color:black; }
+  0%   { background:white; color:black; transform:scale(1); }
+  50%  { background:gold; color:black; transform:scale(1.15); }
+  100% { background:white; color:black; transform:scale(1); }
+}
+
+.diceRoll {
+  animation: diceAnim 0.15s infinite;
+}
+
+@keyframes diceAnim {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+  100% { transform: rotate(-15deg); }
 }
 
 .map{
@@ -102,6 +103,11 @@
   margin-top:10px;
   border:1px solid white;
   overflow:hidden;
+}
+
+.zoomFocus{
+  transform: scale(1.4);
+  transition: transform 0.35s ease;
 }
 
 .tile{
@@ -131,6 +137,15 @@ background:black;
   z-index:5;
 
   transition: left 0.22s linear, top 0.22s linear;
+}
+
+.walk{
+  animation: walkAnim 0.2s infinite alternate;
+}
+
+@keyframes walkAnim{
+  from{ transform:translateY(0px); }
+  to{ transform:translateY(-2px); }
 }
 
 .active{
@@ -365,6 +380,8 @@ let devMode = state.devMode || false;
 
 let messageQueue = [];
 let isShowingMessage = false;
+const walkSE = new Audio("footsteps.mp3");
+walkSE.volume = 0.3;
 
 if(!currentUser){
   alert("ログインしてからプレイしてください");
@@ -419,16 +436,22 @@ function rollDice(){
   }
 
   // ① 振った表示（即消える）
-  const box = document.getElementById("dqMessage");
-  box.innerHTML = "🎲 サイコロを振った！";
-  box.style.display = "block";
+ const box = document.getElementById("dqMessage");
+
+box.innerHTML = "🎲";
+box.style.display = "block";
+box.classList.add("diceRoll");
 
   const roll = Math.floor(Math.random()*6)+1;
 
   // ② 少し待って結果表示
-  setTimeout(()=>{
+ setTimeout(()=>{
 
-    showMessage("🎲 " + roll + " が出た！");
+  const box = document.getElementById("dqMessage");
+
+  box.classList.remove("diceRoll");
+
+  box.innerHTML = "🎲 " + roll + "！";
 
     // ③ 結果メッセージが終わったら移動
     setTimeout(()=>{
@@ -455,6 +478,9 @@ if(tile && tile.type !== "branch" && tile.next){
   state.sugoroku.position += 1;
 }
     steps++;
+
+walkSE.currentTime = 0;
+walkSE.play();
 
     // 🎯 ゴール処理
     const length = state.sugoroku.tiles.length;
@@ -532,6 +558,17 @@ document.getElementById("player").classList.remove("walk");
 
   render();
 
+const tiles = document.querySelectorAll(".tile");
+const currentTile = tiles[state.sugoroku.position];
+
+if(currentTile){
+  currentTile.classList.add("flash");
+
+  setTimeout(()=>{
+    currentTile.classList.remove("flash");
+  },600);
+}
+
   const tiles = document.querySelectorAll(".tile");
   const currentTile = tiles[state.sugoroku.position];
 
@@ -546,7 +583,9 @@ document.getElementById("player").classList.remove("walk");
 const tileType =
   state.sugoroku.tiles[state.sugoroku.position]?.type;
 
+  setTimeout(()=>{
   handleEvent(tileType);
+},600);
 
   emp.sugorokuLastPlayDate = today;
   save();
@@ -1076,6 +1115,9 @@ if(type === "branch"){
   document.getElementById("branchBtn1").textContent =
     labels[routes[1]];
 
+const mapLayer = document.getElementById("mapLayer");
+
+mapLayer.classList.add("zoomFocus");
   document.getElementById("branchUI").style.display = "block";
 
 }
@@ -1317,6 +1359,9 @@ function chooseBranch(index){
 
   document.getElementById("branchUI").style.display = "none";
 
+const mapLayer = document.getElementById("mapLayer");
+mapLayer.classList.remove("zoomFocus");
+
   currentBranch = null;
 
   render();
@@ -1324,7 +1369,9 @@ function chooseBranch(index){
   const tileType =
     state.sugoroku.tiles[state.sugoroku.position]?.type;
 
+  setTimeout(()=>{
   handleEvent(tileType);
+},600);
 
   save();
 }
