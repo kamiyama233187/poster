@@ -521,6 +521,9 @@ document.getElementById("laps").textContent =
 else if(type === "boss"){
   tile.textContent = "⚔";
 }
+else if(type === "cave"){
+  tile.innerHTML = "<img src='cave.png' style='width:20px'>";
+}
 else if(type === "heal"){
   tile.textContent = "❤";
 }
@@ -581,6 +584,9 @@ else if(rand < rate.plus + rate.minus + rate.rare + rate.heal){
 }
 else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss){
   state.sugoroku.tiles.push("boss");
+}
+else if(rand < rate.plus + rate.minus + rate.rare + rate.heal + rate.boss + 0.05){
+  state.sugoroku.tiles.push("cave");
 }
 else{
   state.sugoroku.tiles.push("none");
@@ -668,6 +674,12 @@ const data = STAGE_DATA[stage];
     }, 800);
 
     showMessage("⚔ ボス撃破！80ポイント獲得！", "rare");
+
+if(type === "cave"){
+
+  showMessage("🕳 洞窟を発見した！");
+
+}
 
   }else{
 
