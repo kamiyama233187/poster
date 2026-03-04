@@ -78,6 +78,7 @@
   height:420px;
   margin-top:10px;
   border:1px solid white;
+  overflow:hidden;
 }
 
 .tile{
@@ -198,8 +199,10 @@ Lv：<span id="level">1</span><br>
   <button onclick="rollDice()">サイコロを振る</button>
 
 <div class="map">
-  <div id="map"></div>
-  <div id="player" class="player">🧍</div>
+  <div id="mapLayer">
+    <div id="map"></div>
+    <div id="player" class="player">🧍</div>
+  </div>
 </div>
 
 </div>
@@ -608,6 +611,22 @@ tile.style.top = tileData.y * 60 + "px";
 
     map.appendChild(tile);
   }
+
+const mapLayer = document.getElementById("mapLayer");
+
+if(mapLayer){
+
+  const tileData = state.sugoroku.tiles[state.sugoroku.position];
+
+  const px = tileData.x * 60;
+  const py = tileData.y * 60;
+
+  const cameraX = px - 200;
+  const cameraY = py - 200;
+
+  mapLayer.style.transform =
+    `translate(${-cameraX}px, ${-cameraY}px)`;
+}
 
 // HPバー更新
 const hpPercent =
