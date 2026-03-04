@@ -291,7 +291,8 @@ if(!state.sugoroku){
     tiles: [],
 bonus3Claimed: false,
 hp: 100,
-maxHp: 100
+maxHp: 100,
+inCave: false
   };
   generateMap();
   save();
@@ -521,6 +522,12 @@ document.getElementById("laps").textContent =
 else if(type === "boss"){
   tile.textContent = "⚔";
 }
+else if(type === "exit"){
+  tile.textContent = "🚪";
+}
+else if(type === "treasure"){
+  tile.textContent = "🎁";
+}
 else if(type === "cave"){
   tile.innerHTML = "<img src='cave.png' style='width:20px'>";
 }
@@ -594,6 +601,39 @@ else{
   }
 }
 
+function generateCave(){
+
+  state.sugoroku.tiles = [];
+
+  for(let i=0;i<20;i++){
+
+    if(i === 19){
+      state.sugoroku.tiles.push("exit");
+      continue;
+    }
+
+    const rand = Math.random();
+
+if(rand < 0.15){
+  state.sugoroku.tiles.push("treasure");
+}
+else if(rand < 0.35){
+  state.sugoroku.tiles.push("minus");
+}
+else if(rand < 0.55){
+  state.sugoroku.tiles.push("boss");
+}
+else if(rand < 0.70){
+  state.sugoroku.tiles.push("rare");
+}
+else{
+  state.sugoroku.tiles.push("none");
+}
+
+  }
+
+}
+
 function handleEvent(type){
 
   if(!currentUser || !state.employees[currentUser]){
@@ -655,9 +695,81 @@ if(type === "rare"){
   }
 }
 
+if(type === "treasure"){
+
+  showMessage("🎁 宝箱を発見！");
+
+  const rand = Math.random();
+
+  if(rand < 0.6){
+
+    const gold = 30 + Math.floor(Math.random()*40);
+
+    state.employees[currentUser].totalPoints += gold;
+    state.employees[currentUser].totalEarned += gold;
+
+    showMessage("💰 " + gold + "ポイント手に入れた！");
+
+  }
+  else if(rand < 0.9){
+
+    showMessage("🎁 空っぽだった…");
+
+  }
+  else{
+
+    state.employees[currentUser].totalPoints += 200;
+    state.employees[currentUser].totalEarned += 200;
+
+    showMessage("🌟 超レア宝箱！200ポイント！！","rare");
+
+  }
+
+  save();
+}
+
+if(type === "exit"){
+
+  showMessage("🚪 洞窟を脱出した！");
+
+  state.sugoroku.inCave = false;
+
+  generateMap();
+
+  state.sugoroku.position = 0;
+
+  save();
+  render();
+}
+
 if(type === "cave"){
 
   showMessage("🕳 洞窟を発見した！");
+
+  setTimeout(()=>{
+
+    const enter = confirm("洞窟に入りますか？");
+
+    if(enter){
+
+    showMessage("🕳 洞窟に入った！");
+
+state.sugoroku.inCave = true;
+generateCave();
+state.sugoroku.position = 0;
+
+save();
+render();
+
+    }else{
+
+      showMessage("外を進むことにした");
+
+    }
+
+  },1000);
+
+}
 
 
 if(type === "boss"){
