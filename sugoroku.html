@@ -197,6 +197,17 @@ Lv：<span id="level">1</span><br>
 
 <div id="dqMessage" class="window center" style="display:none;"></div>
 
+<div id="branchUI" style="display:none; text-align:center; margin-top:10px;">
+
+  <div style="margin-bottom:10px;">
+    ↔ 分かれ道！どちらへ進む？
+  </div>
+
+  <button onclick="chooseBranch(0)">① 一本道</button>
+  <button onclick="chooseBranch(1)">② 右ルート</button>
+
+</div>
+
 <div id="devTools" style="display:none; margin-top:10px;">
 
   <input type="number" id="devSteps" placeholder="移動数" style="width:80px;">
@@ -232,7 +243,10 @@ Lv：<span id="level">1</span><br>
 const STORAGE_KEY = "shukkinQuestData_v3";
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
 const currentUser = state.currentUser || null;
+
+let currentBranch = null;
 
 const STAGE_DATA = {
   1: {
@@ -830,8 +844,13 @@ render();
   },1000);
 
 }
-
 if(type === "branch"){
+
+  currentBranch = state.sugoroku.tiles[state.sugoroku.position];
+
+  document.getElementById("branchUI").style.display = "block";
+
+}
 
   const choice = confirm("分かれ道だ！みぎへすすむ？");
 
