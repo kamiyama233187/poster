@@ -559,7 +559,6 @@ for(let i=0;i<length;i++){
 
     if(i === state.sugoroku.position){
   tile.classList.add("active");
-  tile.textContent = state.player.avatar;
 }
 
     if(i === state.sugoroku.tiles.length - 1){
@@ -616,8 +615,6 @@ const hpBar = document.getElementById("hpBar");
 if(hpBar){
   hpBar.style.width = hpPercent + "%";
 }
-}
-
 
 const player = document.getElementById("player");
 
@@ -631,6 +628,7 @@ if(player){
 
   player.textContent = state.player.avatar;
 
+}
 }
 const tools = document.getElementById("devTools");
 
