@@ -529,7 +529,7 @@ document.getElementById("laps").textContent =
 
 const length = state.sugoroku.tiles.length;
 
-for(let i=0;i<length;i++)
+for(let i=0;i<length;i++){
 
     const tile = document.createElement("div");
     tile.className = "tile";
@@ -544,9 +544,9 @@ for(let i=0;i<length;i++)
 
     const type = state.sugoroku.tiles[i]?.type;
 
-    if(i === 29){
-      tile.textContent = "G";
-    }
+   if(i === state.sugoroku.tiles.length - 1){
+  tile.textContent = "G";
+}
     else if(type === "plus"){
       tile.textContent = "+";
     }
@@ -582,7 +582,7 @@ tile.style.left = (i % 6) * 50 + "px";
 tile.style.top = Math.floor(i / 6) * 50 + "px";
     map.appendChild(tile);
   }
-
+}
 // HPバー更新
 const hpPercent =
   (state.sugoroku.hp / state.sugoroku.maxHp) * 100;
@@ -611,7 +611,7 @@ const stage = state.sugoroku.stage;
 
  const length = STAGE_MAP_LENGTH[stage];
 
-for(let i=0;i<length;i++)
+for(let i=0;i<length;i++){
 
 // 分岐テストマス
 if(i === 10){
@@ -674,7 +674,7 @@ else{
 }
   }
 }
-
+}
 function generateCave(){
 
   state.sugoroku.tiles = [];
