@@ -85,7 +85,7 @@
 .map{
   position:relative;
   width:100%;
-  height:420px;
+  height:480px;
   margin-top:10px;
   border:1px solid white;
   overflow:hidden;
@@ -115,6 +115,7 @@ background:black;
   position:absolute;
   font-size:20px;
   pointer-events:none;
+z-index:5;
 }
 
 .active{
@@ -218,6 +219,7 @@ Lv：<span id="level">1</span><br>
     "></div>
   </div>
 </div>
+<button onclick="toggleFullMap()">全体マップ</button>
 
   <button onclick="rollDice()">サイコロを振る</button>
 
@@ -279,6 +281,7 @@ const STORAGE_KEY = "shukkinQuestData_v3";
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
+const CAMERA_VIEW = 5;
 const currentUser = state.currentUser || null;
 
 let currentBranch = null;
@@ -429,7 +432,7 @@ function startMove(roll, emp, today){
     const tile = state.sugoroku.tiles[state.sugoroku.position];
 
 
-if(tile && tile.next){
+if(tile && tile.type !== "branch" && tile.next){
   state.sugoroku.position = tile.next[0];
 }else{
   state.sugoroku.position += 1;
@@ -672,8 +675,15 @@ if(mapLayer){
   const px = tileData.x * 60;
   const py = tileData.y * 60;
 
-  const cameraX = px - 200;
-  const cameraY = py - 200;
+  const tileSize = 60;
+
+const view = CAMERA_VIEW;
+
+const cameraX = px - tileSize * view;
+const cameraY = py - tileSize * view;
+
+mapLayer.style.transform =
+ `translate(${-cameraX}px, ${-cameraY}px)`;
 
   mapLayer.style.transform =
     `translate(${-cameraX}px, ${-cameraY}px)`;
@@ -727,18 +737,16 @@ function generateMap(){
   let y = 0;
 
   const branchChance = 0.15;
-  const mergeChance = 0.4;
-
-  let activeBranches = [];
 
   for(let i=0;i<length;i++){
 
     x += 1;
 
-    if(Math.random()<0.35){
+    if(Math.random() < 0.35){
       y += 1;
     }
 
+    // ゴール
     if(i === length-1){
 
       state.sugoroku.tiles.push({
@@ -750,38 +758,58 @@ function generateMap(){
       break;
     }
 
-    // 分岐生成
+    // ===== 分岐 =====
     if(Math.random()<branchChance && i>5 && i<length-6){
 
-      const branchY = y+1;
+      const branchIndex = state.sugoroku.tiles.length;
+      const branchY = y + 1;
 
-    const branchTile = {
-  type:"branch",
-  next:[i+1,i+2],
-  routeType:[
-    Math.random()<0.5?"safe":"danger",
-    Math.random()<0.5?"treasure":"danger"
-  ],
-  x:x,
-  y:y
-};
+      const routeA = branchIndex + 1;
+      const routeB = branchIndex + 2;
+      const merge = branchIndex + 3;
+
+      const branchTile = {
+        type:"branch",
+        next:[routeA,routeB],
+        routeType:[
+          Math.random()<0.5?"safe":"danger",
+          Math.random()<0.5?"treasure":"danger"
+        ],
+        x:x,
+        y:y
+      };
 
       state.sugoroku.tiles.push(branchTile);
 
-      // 分岐ルート
+      // ルートA
       state.sugoroku.tiles.push({
         type:"none",
-        next:[i+3],
+        next:[merge],
+        x:x+1,
+        y:y
+      });
+
+      // ルートB
+      state.sugoroku.tiles.push({
+        type:"none",
+        next:[merge],
         x:x+1,
         y:branchY
       });
 
-      activeBranches.push(i+1);
+      // 合流
+      state.sugoroku.tiles.push({
+        type:"none",
+        next:[merge+1],
+        x:x+2,
+        y:y
+      });
 
       continue;
     }
 
-    // 通常マス生成
+    // ===== 通常マス =====
+
     const rand = Math.random();
     const rate = STAGE_TILE_RATE[stage];
 
@@ -796,7 +824,7 @@ function generateMap(){
 
     state.sugoroku.tiles.push({
       type:type,
-      next:[i+1],
+      next:[state.sugoroku.tiles.length+1],
       x:x,
       y:y
     });
@@ -1328,6 +1356,27 @@ function drawMiniMap(){
   ctx.beginPath();
   ctx.arc(p.x*scale+10, p.y*scale+10, 3, 0, Math.PI*2);
   ctx.fill();
+
+}
+
+let fullMap = false;
+
+function toggleFullMap(){
+
+  fullMap = !fullMap;
+
+  const mapLayer = document.getElementById("mapLayer");
+
+  if(fullMap){
+
+    mapLayer.style.transform = "translate(0px,0px)";
+    showMessage("🗺 全体マップ");
+
+  }else{
+
+    render();
+
+  }
 
 }
 
