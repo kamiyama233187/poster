@@ -641,7 +641,8 @@ if(devMode){
 
 
 function generateMap(){
-
+let x = 0;
+let y = 0;
 const stage = state.sugoroku.stage;
 
   state.sugoroku.tiles = [];
@@ -659,6 +660,12 @@ if(i === 10){
   continue;
 }
 
+x += 1;
+
+if(Math.random() < 0.3){
+  y += 1;
+}
+
     if(i === length - 1){
   state.sugoroku.tiles.push({type:"goal"});
   continue;
@@ -667,10 +674,11 @@ if(i === 10){
 const rand = Math.random();
 const rate = STAGE_TILE_RATE[stage];
 
-if(rand < rate.plus){
-  state.sugoroku.tiles.push({
+state.sugoroku.tiles.push({
   type:"plus",
-  next:[i+1]
+  next:[i+1],
+  x:0,
+  y:0
 });
 }
 else if(rand < rate.plus + rate.minus){
