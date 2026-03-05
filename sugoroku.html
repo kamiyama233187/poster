@@ -479,16 +479,26 @@ document.getElementById("player").classList.add("walk");
 
 const tile = state.sugoroku.tiles[state.sugoroku.position];
 
-if(tile){
+if(!tile) return;
 
-  if(tile.next && tile.next.length > 0){
-    state.sugoroku.position = tile.next[0];
-  }else{
-    state.sugoroku.position += 1;
-  }
+// 分岐マスなら止まる
+if(tile.type === "branch"){
+  clearInterval(moveInterval);
+  handleEvent("branch");
+  return;
+}
 
+// 通常移動
+if(tile.next && tile.next.length > 0){
+  state.sugoroku.position = tile.next[0];
+}else{
+  state.sugoroku.position += 1;
 }
     steps++;
+if(steps > 20){
+  clearInterval(moveInterval);
+  return;
+}
 
 walkSE.currentTime = 0;
 walkSE.play();
