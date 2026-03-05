@@ -673,23 +673,31 @@ path.style.transform = `rotate(${angle}deg)`;
 
 const mapLayer = document.getElementById("mapLayer");
 
-if(mapLayer && !fullMap){
+if(mapLayer){
 
-  const tileData = state.sugoroku.tiles[state.sugoroku.position];
+  if(fullMap){
 
-  const px = tileData.x * 60;
-  const py = tileData.y * 60;
+    mapLayer.style.transform = "translate(0,0)";
 
-  const mapView = document.querySelector(".map");
+  }else{
 
-  const viewWidth = mapView.clientWidth;
-const viewHeight = mapView.clientHeight;
+    const tileData = state.sugoroku.tiles[state.sugoroku.position];
 
-  const cameraX = px - viewWidth / 2 + 30;
-  const cameraY = py - viewHeight / 2 + 30;
+    const px = tileData.x * 60;
+    const py = tileData.y * 60;
 
-  mapLayer.style.transform =
-    `translate(${-cameraX}px, ${-cameraY}px)`;
+    const mapView = document.querySelector(".map");
+
+    const viewWidth = mapView.clientWidth;
+    const viewHeight = mapView.clientHeight;
+
+    const cameraX = px - viewWidth / 2 + 30;
+    const cameraY = py - viewHeight / 2 + 30;
+
+    mapLayer.style.transform =
+      `translate(${-cameraX}px, ${-cameraY}px)`;
+
+  }
 
 }
 
