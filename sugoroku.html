@@ -722,10 +722,9 @@ player.style.top = (y + 10) + "px";
 drawMiniMap();
 // 視界制限
 
-const playerTile =
-  state.sugoroku.tiles[state.sugoroku.position];
-
 const tiles = document.querySelectorAll(".tile");
+
+const playerTile = state.sugoroku.tiles[state.sugoroku.position];
 
 tiles.forEach(tile=>{
 
@@ -734,13 +733,21 @@ tiles.forEach(tile=>{
     return;
   }
 
-  const dist = Math.abs(index - state.sugoroku.position);
+  const index = Number(tile.dataset.index);
+  const tileData = state.sugoroku.tiles[index];
 
-if(dist > 5){
- tile.style.visibility="hidden";
-}else{
- tile.style.visibility="visible";
-}
+  if(!tileData) return;
+
+  const dx = Math.abs(tileData.x - playerTile.x);
+  const dy = Math.abs(tileData.y - playerTile.y);
+
+  const dist = dx + dy;
+
+  if(dist > 5){
+    tile.style.visibility="hidden";
+  }else{
+    tile.style.visibility="visible";
+  }
 
 });
 
@@ -770,53 +777,57 @@ function generateMap(){
 
     x++;
 
-    if(Math.random()<0.35) y++;
+    if(Math.random() < 0.35){
+      y++;
+    }
 
     state.sugoroku.tiles.push({
       x:x,
       y:y,
-      next:[i+1],
-      type:"none"
+      type:"none",
+      next:[i+1]
     });
 
   }
 
   // ゴール
-  state.sugoroku.tiles[length-1].type="goal";
-  state.sugoroku.tiles[length-1].next=[];
+  state.sugoroku.tiles[length-1].type = "goal";
+  state.sugoroku.tiles[length-1].next = [];
+
+
 
   // 分岐生成
-  const branchCount = Math.floor(length/12);
+  const branchCount = Math.floor(length/10);
 
   for(let i=0;i<branchCount;i++){
 
-    const start = Math.floor(Math.random()*(length-20))+5;
+    const start = Math.floor(Math.random()*(length-15))+5;
 
-    const branchStart = state.sugoroku.tiles[start];
-    if(!branchStart) continue;
+    const startTile = state.sugoroku.tiles[start];
 
-    branchStart.type="branch";
+    if(!startTile) continue;
 
-    // ルートタイプ
-    const routes = ["safe","danger","treasure"]
-      .sort(()=>Math.random()-0.5)
-      .slice(0,2);
+    startTile.type = "branch";
 
-    branchStart.routeType = routes;
+    const branchStartIndex = state.sugoroku.tiles.length;
 
-    const branchIndex = state.sugoroku.tiles.length;
-
-    branchStart.next = [
+    startTile.next = [
       start+1,
-      branchIndex
+      branchStartIndex
     ];
 
-    let bx = branchStart.x;
-    let by = branchStart.y+1;
+    startTile.routeType = ["safe","danger"];
+
+
+
+    let bx = startTile.x;
+    let by = startTile.y + 1;
 
     const branchLength = Math.floor(Math.random()*4)+3;
 
-    let prevIndex = branchIndex;
+    let prevIndex = branchStartIndex;
+
+
 
     for(let j=0;j<branchLength;j++){
 
@@ -824,60 +835,50 @@ function generateMap(){
 
       const newIndex = state.sugoroku.tiles.length;
 
-      let type="none";
-
-      const r=Math.random();
-
-      if(r<0.25) type="minus";
-      else if(r<0.45) type="boss";
-      else if(r<0.6) type="rare";
-      else if(r<0.75) type="heal";
-      else if(r<0.85) type="cave";
-
       state.sugoroku.tiles.push({
         x:bx,
         y:by,
-        next:[],
-        type:type
+        type:"none",
+        next:[]
       });
 
       if(j>0){
         state.sugoroku.tiles[prevIndex].next=[newIndex];
       }
 
-      prevIndex=newIndex;
+      prevIndex = newIndex;
 
     }
 
-    const merge=start+branchLength+2;
 
-    if(merge<length){
 
-      state.sugoroku.tiles[prevIndex].next=[merge];
+    const merge = start + branchLength + 2;
 
+    if(merge < length){
+      state.sugoroku.tiles[prevIndex].next = [merge];
     }else{
-
-      state.sugoroku.tiles[prevIndex].next=[length-1];
-
+      state.sugoroku.tiles[prevIndex].next = [length-1];
     }
 
   }
 
-  // 通常マス生成
+
+
+  // マス内容
   const rate = STAGE_TILE_RATE[stage];
 
   state.sugoroku.tiles.forEach(tile=>{
 
-    if(tile.type!=="none") return;
+    if(tile.type !== "none") return;
 
-    const r=Math.random();
+    const r = Math.random();
 
-    if(r<rate.plus) tile.type="plus";
-    else if(r<rate.plus+rate.minus) tile.type="minus";
-    else if(r<rate.plus+rate.minus+rate.rare) tile.type="rare";
-    else if(r<rate.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
-    else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
-    else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
+    if(r < rate.plus) tile.type="plus";
+    else if(r < rate.plus+rate.minus) tile.type="minus";
+    else if(r < rate.plus+rate.minus+rate.rare) tile.type="rare";
+    else if(r < rate.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
+    else if(r < rate.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
+    else if(r < rate.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
 
   });
 
@@ -1437,15 +1438,15 @@ function toggleFullMap(){
   if(fullMap){
 
     map.classList.add("full");
-mapLayer.style.transform="translate(0,0)";
-render();
+    mapLayer.style.transform="translate(0,0)";
 
   }else{
 
     map.classList.remove("full");
-    render();
 
   }
+
+  render();
 
 }
 
