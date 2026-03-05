@@ -734,9 +734,6 @@ function updateVisibility(){
 
   const tiles = document.querySelectorAll(".tile");
 
-  const playerTile = state.sugoroku.tiles[state.sugoroku.position];
-  if(!playerTile) return;
-
   tiles.forEach(tile=>{
 
     if(fullMap){
@@ -745,16 +742,11 @@ function updateVisibility(){
     }
 
     const index = Number(tile.dataset.index);
-    const tileData = state.sugoroku.tiles[index];
 
-    if(!tileData) return;
+    const backLimit = state.sugoroku.position - 2;
+    const frontLimit = state.sugoroku.position + 5;
 
-    const dx = tileData.x - playerTile.x;
-    const dy = tileData.y - playerTile.y;
-
-    const dist = Math.abs(dx) + Math.abs(dy);
-
-    if(dist > 5){
+    if(index < backLimit || index > frontLimit){
       tile.style.visibility="hidden";
     }else{
       tile.style.visibility="visible";
