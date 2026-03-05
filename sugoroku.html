@@ -476,7 +476,7 @@ document.getElementById("player").classList.add("walk");
     const tile = state.sugoroku.tiles[state.sugoroku.position];
 
 
-if(tile && tile.type !== "branch" && tile.next){
+if(tile && tile.next){
   state.sugoroku.position = tile.next[0];
 }else{
   state.sugoroku.position += 1;
