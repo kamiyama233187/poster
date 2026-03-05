@@ -477,18 +477,9 @@ document.getElementById("player").classList.add("walk");
 
   const moveInterval = setInterval(()=>{
 
-    const tile = state.sugoroku.tiles[state.sugoroku.position];
-
+const tile = state.sugoroku.tiles[state.sugoroku.position];
 
 if(tile){
-
-  if(tile.type === "branch"){
-    clearInterval(moveInterval);
-    document.getElementById("player").classList.remove("walk");
-    render();
-    handleEvent("branch");
-    return;
-  }
 
   if(tile.next && tile.next.length > 0){
     state.sugoroku.position = tile.next[0];
@@ -589,10 +580,20 @@ if(currentTile){
   },600);
 }
 
+const tile = state.sugoroku.tiles[state.sugoroku.position];
+if(!tile) return;
+
+if(tile?.type === "branch"){
+  emp.sugorokuLastPlayDate = today;
+  save();
+  handleEvent("branch");
+  return;
+}
+
 const tileType =
   state.sugoroku.tiles[state.sugoroku.position]?.type;
 
-  setTimeout(()=>{
+setTimeout(()=>{
   handleEvent(tileType);
 },600);
 
@@ -785,10 +786,11 @@ player.style.top = (y + 10) + "px";
 }
 drawMiniMap();
 // 視界制限
-const tiles = document.querySelectorAll(".tile");
 
 const playerTile =
   state.sugoroku.tiles[state.sugoroku.position];
+
+const tiles = document.querySelectorAll(".tile");
 
 tiles.forEach(tile=>{
 
@@ -798,20 +800,18 @@ tiles.forEach(tile=>{
   }
 
   const index = Number(tile.dataset.index);
-  const t = state.sugoroku.tiles[index];
 
-  if(!t) return;
-
-  const dx = Math.abs(t.x - playerTile.x);
-  const dy = Math.abs(t.y - playerTile.y);
-
-  if(dx > 5 || dy > 3){
+  if(
+    index < state.sugoroku.position - 2 ||
+    index > state.sugoroku.position + 5
+  ){
     tile.style.visibility="hidden";
   }else{
     tile.style.visibility="visible";
   }
 
 });
+
 }
 const tools = document.getElementById("devTools");
 
@@ -1387,10 +1387,17 @@ mapLayer.classList.remove("zoomFocus");
 
   render();
 
-  const tileType =
-    state.sugoroku.tiles[state.sugoroku.position]?.type;
+ const tile = state.sugoroku.tiles[state.sugoroku.position];
 
-  setTimeout(()=>{
+if(tile?.type === "branch"){
+  handleEvent("branch");
+  return;
+}
+
+const tileType =
+  state.sugoroku.tiles[state.sugoroku.position]?.type;
+
+setTimeout(()=>{
   handleEvent(tileType);
 },600);
 
@@ -1452,20 +1459,17 @@ function toggleFullMap(){
 
   fullMap = !fullMap;
 
-  const mapLayer = document.getElementById("mapLayer");
   const map = document.querySelector(".map");
+  const mapLayer = document.getElementById("mapLayer");
 
   if(fullMap){
 
-    mapLayer.style.transform = "translate(0px,0px)";
     map.classList.add("full");
-
-    showMessage("🗺 全体マップ（スクロールできます）");
+    mapLayer.style.transform="translate(0,0)";
 
   }else{
 
     map.classList.remove("full");
-
     render();
 
   }
