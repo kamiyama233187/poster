@@ -483,12 +483,16 @@ document.getElementById("player").classList.add("walk");
 if(tile){
 
   if(tile.type === "branch"){
-    // 分岐はここでは止まる
+    clearInterval(moveInterval);
+    document.getElementById("player").classList.remove("walk");
+    render();
+    handleEvent("branch");
+    return;
   }
-  else if(tile.next && tile.next.length > 0){
+
+  if(tile.next && tile.next.length > 0){
     state.sugoroku.position = tile.next[0];
-  }
-  else{
+  }else{
     state.sugoroku.position += 1;
   }
 
@@ -702,6 +706,7 @@ tile.style.top = tileData.y * 60 + "px";
 if(i > 0){
 
   const prev = state.sugoroku.tiles[i-1];
+if(!prev) continue;
 
   const x1 = prev.x * 60 + 22;
   const y1 = prev.y * 60 + 22;
