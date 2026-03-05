@@ -348,9 +348,11 @@ const STAGE_DATA = {
 };
 
 const STAGE_MAP_LENGTH = {
-  1:30,
-  2:40,
-  3:50
+ 1:60,
+ 2:70,
+ 3:80,
+ 4:70,
+ 5:80
 };
 
 const STAGE_TILE_RATE = {
@@ -830,7 +832,7 @@ function generateMap(){
   state.sugoroku.tiles[length-1].type="goal";
 
   // 分岐生成
-  const branchCount = Math.floor(length/10);
+  const branchCount = Math.floor(length/6);
 
   for(let i=0;i<branchCount;i++){
 
