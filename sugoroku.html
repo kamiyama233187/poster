@@ -841,80 +841,119 @@ function generateMap(){
   let x = 0;
   let y = 0;
 
-  // 一本道生成
+  // メインルート
   for(let i=0;i<length;i++){
 
     x++;
 
-    if(Math.random()<0.35){
-      y++;
-    }
+    if(Math.random()<0.35) y++;
 
     state.sugoroku.tiles.push({
-  x:x,
-  y:y,
-  next: i < length-1 ? [i+1] : []
-});
+      x:x,
+      y:y,
+      next:[i+1],
+      type:"none"
+    });
 
   }
 
   // ゴール
   state.sugoroku.tiles[length-1].type="goal";
+  state.sugoroku.tiles[length-1].next=[];
 
   // 分岐生成
   const branchCount = Math.floor(length/12);
 
   for(let i=0;i<branchCount;i++){
 
-    const start = Math.floor(Math.random()*(length-10))+3;
-    const end = start + Math.floor(Math.random()*6)+3;
-
-    if(end>=length-1) continue;
+    const start = Math.floor(Math.random()*(length-20))+5;
 
     const branchStart = state.sugoroku.tiles[start];
+    if(!branchStart) continue;
 
     branchStart.type="branch";
-branchStart.routeType=["safe","danger"];
+
+    // ルートタイプ
+    const routes = ["safe","danger","treasure"]
+      .sort(()=>Math.random()-0.5)
+      .slice(0,2);
+
+    branchStart.routeType = routes;
 
     const branchIndex = state.sugoroku.tiles.length;
 
-    branchStart.next=[start+1,branchIndex];
+    branchStart.next = [
+      start+1,
+      branchIndex
+    ];
 
     let bx = branchStart.x;
     let by = branchStart.y+1;
 
-    for(let j=start;j<end;j++){
+    const branchLength = Math.floor(Math.random()*4)+3;
+
+    let prevIndex = branchIndex;
+
+    for(let j=0;j<branchLength;j++){
 
       bx++;
+
+      const newIndex = state.sugoroku.tiles.length;
+
+      let type="none";
+
+      const r=Math.random();
+
+      if(r<0.25) type="minus";
+      else if(r<0.45) type="boss";
+      else if(r<0.6) type="rare";
+      else if(r<0.75) type="heal";
+      else if(r<0.85) type="cave";
 
       state.sugoroku.tiles.push({
         x:bx,
         y:by,
-        next:[state.sugoroku.tiles.length+1]
+        next:[],
+        type:type
       });
+
+      if(j>0){
+        state.sugoroku.tiles[prevIndex].next=[newIndex];
+      }
+
+      prevIndex=newIndex;
 
     }
 
-    state.sugoroku.tiles[state.sugoroku.tiles.length-1].next=[end];
-state.sugoroku.tiles[state.sugoroku.tiles.length-1].type="none";
+    const merge=start+branchLength+2;
+
+    if(merge<length){
+
+      state.sugoroku.tiles[prevIndex].next=[merge];
+
+    }else{
+
+      state.sugoroku.tiles[prevIndex].next=[length-1];
+
+    }
 
   }
 
-  // マス内容ランダム
+  // 通常マス生成
   const rate = STAGE_TILE_RATE[stage];
 
   state.sugoroku.tiles.forEach(tile=>{
 
-    if(tile.type==="branch" || tile.type==="goal") return;
+    if(tile.type!=="none") return;
 
-    const rand=Math.random();
+    const r=Math.random();
 
-    if(rand<rate.plus) tile.type="plus";
-    else if(rand<rate.plus+rate.minus) tile.type="minus";
-    else if(rand<rate.plus+rate.minus+rate.rare) tile.type="rare";
-    else if(rand<rate.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
-    else if(rand<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
-    else tile.type="none";
+    if(r<rate.plus) tile.type="plus";
+    else if(r<rate.plus+rate.minus) tile.type="minus";
+    else if(r<rate.plus+rate.minus+rate.rare) tile.type="rare";
+    else if(r<rate.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
+    else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
+    else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
 
   });
 
