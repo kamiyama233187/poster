@@ -6,9 +6,11 @@
 <title>すごろく</title>
 
 <style>
-
 #mapLayer{
   transition: transform 0.25s linear;
+  position:relative;
+  width:4000px;
+  height:2000px;
 }
 
 #miniMapBox{
@@ -478,7 +480,7 @@ document.getElementById("player").classList.add("walk");
     const tile = state.sugoroku.tiles[state.sugoroku.position];
 
 
-if(tile && tile.next){
+if(tile && tile.type !== "branch" && tile.next){
   state.sugoroku.position = tile.next[0];
 }else{
   state.sugoroku.position += 1;
@@ -496,7 +498,7 @@ if(state.sugoroku.position >= length){
       state.sugoroku.laps += 1;
 state.sugoroku.stage += 1;
 
-if(state.sugoroku.stage > 3){
+if(state.sugoroku.stage > 5){
   state.sugoroku.stage = 1;
 }
 
@@ -779,7 +781,7 @@ if(fullMap){
   return;
 }
 
-  const index = parseInt(tile.dataset.index);
+  const index = Number(tile.dataset.index);
 
   if(
     index < state.sugoroku.position - 2 ||
