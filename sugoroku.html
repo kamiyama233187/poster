@@ -105,6 +105,10 @@
   overflow:hidden;
 }
 
+.map.full{
+  overflow:auto;
+}
+
 .zoomFocus{
   transform: scale(1.4);
   transition: transform 0.35s ease;
@@ -634,6 +638,7 @@ const tileData = state.sugoroku.tiles[i];
 
     const tile = document.createElement("div");
     tile.className = "tile";
+tile.dataset.index = i;
 
     if(i === state.sugoroku.position){
   tile.classList.add("active");
@@ -762,6 +767,27 @@ player.style.top = (y + 10) + "px";
 
 }
 drawMiniMap();
+// 視界制限
+const tiles = document.querySelectorAll(".tile");
+
+tiles.forEach(tile=>{
+
+if(fullMap){
+  tile.style.visibility = "visible";
+  return;
+}
+
+  const index = parseInt(tile.dataset.index);
+
+  if(
+    index < state.sugoroku.position - 2 ||
+    index > state.sugoroku.position + 5
+  ){
+    tile.style.visibility = "hidden";
+  }else{
+    tile.style.visibility = "visible";
+  }
+});
 }
 const tools = document.getElementById("devTools");
 
@@ -1421,13 +1447,18 @@ function toggleFullMap(){
   fullMap = !fullMap;
 
   const mapLayer = document.getElementById("mapLayer");
+  const map = document.querySelector(".map");
 
   if(fullMap){
 
     mapLayer.style.transform = "translate(0px,0px)";
-    showMessage("🗺 全体マップ");
+    map.classList.add("full");
+
+    showMessage("🗺 全体マップ（スクロールできます）");
 
   }else{
+
+    map.classList.remove("full");
 
     render();
 
