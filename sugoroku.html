@@ -135,6 +135,7 @@ background:black;
   background:white;
   transform-origin:left center;
   z-index:0;
+  display:none;
 }
 
 .player{
@@ -666,6 +667,7 @@ switch(tileData.type){
 case "plus": tile.textContent="+"; break;
 case "minus": tile.textContent="-"; break;
 case "rare": tile.textContent="★"; break;
+case "cave": tile.textContent="cave.png"; break;
 case "boss": tile.textContent="⚔"; break;
 case "branch": tile.textContent="↔"; break;
 case "heal": tile.textContent="❤"; break;
