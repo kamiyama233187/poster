@@ -674,7 +674,9 @@ if(!prev) continue;
 
 const mapLayer = document.getElementById("mapLayer");
 
-if(mapLayer){
+const mapLayer = document.getElementById("mapLayer");
+
+if(mapLayer && !fullMap){
 
   const tileData = state.sugoroku.tiles[state.sugoroku.position];
 
@@ -683,16 +685,12 @@ if(mapLayer){
 
   const tileSize = 60;
 
-const view = CAMERA_VIEW;
-
-const cameraX = px - tileSize * CAMERA_BACK;
-const cameraY = py - tileSize * CAMERA_BACK;
-
-mapLayer.style.transform =
- `translate(${-cameraX}px, ${-cameraY}px)`;
+  const cameraX = px - tileSize * CAMERA_BACK;
+  const cameraY = py - tileSize * CAMERA_BACK;
 
   mapLayer.style.transform =
-    `translate(${-cameraX}px, ${-cameraY}px)`;
+   `translate(${-cameraX}px, ${-cameraY}px)`;
+
 }
 
 // HPバー更新
@@ -714,8 +712,8 @@ const tileData = state.sugoroku.tiles[state.sugoroku.position];
 const x = tileData.x * 60;
 const y = tileData.y * 60;
 
-player.style.left = (x + 12) + "px";
-player.style.top = (y + 10) + "px";
+player.style.left = (x + 22) + "px";
+player.style.top = (y + 18) + "px";
 
   player.textContent = state.player.avatar;
 
@@ -1433,7 +1431,7 @@ function toggleFullMap(){
   if(fullMap){
 
     map.classList.add("full");
-    mapLayer.style.transform="translate(0,0)";
+    mapLayer.style.transform = "translate(0,0)";
 
   }else{
 
