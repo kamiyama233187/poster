@@ -1326,6 +1326,9 @@ ctx.clearRect(0,0,canvas.width,canvas.height);
 const tiles = state.sugoroku.tiles;
 if(!tiles || tiles.length===0) return;
 
+const p = tiles[state.sugoroku.position];
+if(!p) return;
+
 const scale = 4;
 
 ctx.strokeStyle="white";
@@ -1333,7 +1336,7 @@ ctx.lineWidth=2;
 
 /* ルート描画 */
 
-tiles.forEach((tile,index)=>{
+tiles.forEach((tile)=>{
 
 if(!tile.next) return;
 
@@ -1353,8 +1356,6 @@ ctx.stroke();
 
 /* プレイヤー */
 
-const p = tiles[state.sugoroku.position];
-
 ctx.fillStyle="red";
 ctx.beginPath();
 ctx.arc(p.x*scale+10,p.y*scale+10,3,0,Math.PI*2);
@@ -1362,7 +1363,37 @@ ctx.fill();
 
 }
 
-let fullMap = false;
+function updateVisibility(){
+
+const tiles = document.querySelectorAll(".tile");
+
+tiles.forEach(tile=>{
+
+const index = Number(tile.dataset.index);
+
+if(fullMap){
+
+tile.style.visibility="visible";
+return;
+
+}
+
+const back = state.sugoroku.position - 2;
+const front = state.sugoroku.position + 5;
+
+if(index < back || index > front){
+
+tile.style.visibility="hidden";
+
+}else{
+
+tile.style.visibility="visible";
+
+}
+
+});
+
+}
 
 function toggleFullMap(){
 
@@ -1373,21 +1404,28 @@ const mapLayer = document.getElementById("mapLayer");
 
 if(fullMap){
 
-// 全体マップモード
+/* 全体マップ */
+
 mapView.classList.add("full");
 
-// カメラ解除
+/* カメラ解除 */
+
 mapLayer.style.transform = "translate(0px,0px)";
 
-// プレイヤー中央に移動しない
-updateVisibility();
+/* 全マス表示 */
+
+document.querySelectorAll(".tile").forEach(tile=>{
+tile.style.visibility="visible";
+});
 
 }else{
 
-// 通常視界モード
+/* 通常モード */
+
 mapView.classList.remove("full");
 
-// カメラ再計算
+/* renderでカメラ再計算 */
+
 render();
 
 }
