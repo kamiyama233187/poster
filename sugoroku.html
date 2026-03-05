@@ -680,10 +680,10 @@ if(mapLayer && !fullMap){
   const px = tileData.x * 60;
   const py = tileData.y * 60;
 
-  const map = document.querySelector(".map");
+  const mapView = document.querySelector(".map");
 
-  const viewWidth = map.clientWidth;
-  const viewHeight = map.clientHeight;
+  const viewWidth = mapView.clientWidth;
+const viewHeight = mapView.clientHeight;
 
   const cameraX = px - viewWidth / 2 + 30;
   const cameraY = py - viewHeight / 2 + 30;
