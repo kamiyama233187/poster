@@ -600,7 +600,8 @@ const STAGE_TILE_RATE = {
 
 
 
-window.addEventListener("DOMContentLoaded",()
+window.addEventListener("DOMContentLoaded",()=>{
+
 if(devMode){
 document.getElementById("devTools").style.display="block";
 }
@@ -1076,7 +1077,20 @@ tile.type="hidden";
 
 }
 
-const branchCount = Math.floor(path.length/10);
+const branchCount = Math.max(1, Math.floor(path.length/20));
+
+let used = [];
+
+for(let i=0;i<branchCount;i++){
+
+let pos;
+
+do{
+pos = Math.floor(Math.random()*(path.length-10))+3;
+}
+while(used.some(p=>Math.abs(p-pos)<6));
+
+used.push(pos);
 
 for(let i=0;i<branchCount;i++){
 
