@@ -600,12 +600,7 @@ const STAGE_TILE_RATE = {
 
 
 
-let devMode = state.devMode || false;
-if(devMode){
-document.getElementById("devTools").style.display="block";
-}
-window.addEventListener("DOMContentLoaded",()=>{
-
+window.addEventListener("DOMContentLoaded",()
 if(devMode){
 document.getElementById("devTools").style.display="block";
 }
@@ -1159,11 +1154,11 @@ if(tile.type!=="none") return;
 const r=Math.random();
 
 if(r<rateMod.plus) tile.type="plus";
-else if(r<rate.plus+rate.minus) tile.type="minus";
-else if(r<rateMod.plus+rate.minus+rate.rare) tile.type="rare";
-else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
-else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
-else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
+else if(r<rateMod.plus+rateMod.minus) tile.type="minus";
+else if(r<rateMod.plus+rateMod.minus+rateMod.rare) tile.type="rare";
+else if(r<rateMod.plus+rateMod.minus+rateMod.rare+rateMod.heal) tile.type="heal";
+else if(r<rateMod.plus+rateMod.minus+rateMod.rare+rateMod.heal+rateMod.boss) tile.type="boss";
+else if(r<rateMod.plus+rateMod.minus+rateMod.rare+rateMod.heal+rateMod.boss+rateMod.cave) tile.type="cave";
 
 });
 
@@ -1260,6 +1255,7 @@ state.employees[currentUser].sugorokuLaps++;
 
 generateMap();
 state.sugoroku.position=0;
+currentRouteEffect = null;
 
 save();
 render();
