@@ -148,9 +148,14 @@ const body = document.getElementById("body");
 const hair = document.getElementById("hair");
 const clothes = document.getElementById("clothes");
 
-body.src = "assets/body/" + state.player.body + ".png";
-hair.src = "assets/hair/" + state.player.hair + ".png";
-clothes.src = "assets/clothes/" + state.player.armor + ".png";
+document.getElementById("body").src =
+"assets/body/body"+state.player.body+".png";
+
+document.getElementById("hair").src =
+"assets/hair/hair"+state.player.hair+".png";
+
+document.getElementById("clothes").src =
+"assets/clothes/clothes"+state.player.armor+".png";
 
 body.style.objectPosition =
 "-"+frameX+"px -"+frameY+"px";
