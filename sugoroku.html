@@ -628,6 +628,7 @@ if(!state.sugoroku){
     laps: 0,
     lastPlayDate: null,
     tiles: [],
+    caveReturnPos: 0,
 bonus3Claimed: false,
 hp: 100,
 maxHp: 100,
@@ -1092,10 +1093,6 @@ while(used.some(p=>Math.abs(p-pos)<6));
 
 used.push(pos);
 
-for(let i=0;i<branchCount;i++){
-
-const pos = Math.floor(Math.random()*(path.length-10))+3;
-
 const tile = state.sugoroku.tiles[pos];
 
 if(!tile || tile.type!=="none") continue;
@@ -1389,8 +1386,7 @@ if(type === "exit"){
   state.sugoroku.inCave = false;
 
   generateMap();
-
-  state.sugoroku.position = 0;
+state.sugoroku.position = state.sugoroku.caveReturnPos;
 
   save();
   render();
@@ -1407,6 +1403,8 @@ if(type === "cave"){
     if(enter){
 
     showMessage("🕳 洞窟に入った！");
+
+state.sugoroku.caveReturnPos = state.sugoroku.position;
 
 state.sugoroku.inCave = true;
 generateCave();
