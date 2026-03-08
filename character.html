@@ -55,11 +55,19 @@ margin:10px;
 }
 
 .parts img{
-width:48px;
-height:48px;
+
+width:64px;
+height:64px;
+
+object-fit:none;
 image-rendering:pixelated;
+
+/* 正面フレーム */
+object-position:-64px -192px;
+
 cursor:pointer;
 border:1px solid #444;
+
 }
 
 .parts img:hover{
@@ -92,8 +100,9 @@ color:black;
 <div class="preview">
 
 <img id="body">
-<img id="hair">
+<img id="legs">
 <img id="clothes">
+<img id="hair">
 
 </div>
 
@@ -108,7 +117,8 @@ color:black;
 
 <h3>髪型</h3>
 <div id="hairList" class="parts"></div>
-
+<h3>ボトムス</h3>
+<div id="legsList" class="parts"></div>
 <h3>服</h3>
 <div id="clothesList" class="parts"></div>
 
@@ -121,6 +131,7 @@ let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 if(!state.player){
 state.player = {
 body:0,
+legs:0,
 hair:0,
 armor:0
 };
@@ -131,12 +142,14 @@ armor:0
 const bodyCount = 52;
 const hairCount = 416;
 const clothesCount = 562;
+const legsCount = 142;
 
 /* リスト */
 
 const bodyList=document.getElementById("bodyList");
 const hairList=document.getElementById("hairList");
 const clothesList=document.getElementById("clothesList");
+const legsList=document.getElementById("legsList");
 
 /* body */
 
@@ -198,12 +211,34 @@ clothesList.appendChild(img);
 
 }
 
+/* clothes */
+for(let i=0;i<legsCount;i++){
+
+const img=document.createElement("img");
+
+img.src="assets/legs/legs"+i+".png";
+
+img.onclick=()=>{
+
+state.player.legs=i;
+
+render();
+
+};
+
+legsList.appendChild(img);
+
+}
+
 /* 描画 */
 
 function render(){
 
 document.getElementById("body").src =
 "assets/body/body"+state.player.body+".png";
+
+document.getElementById("legs").src =
+"assets/legs/legs"+state.player.legs+".png";
 
 document.getElementById("hair").src =
 "assets/hair/hair"+state.player.hair+".png";
@@ -219,6 +254,9 @@ function randomChar(){
 
 state.player.body =
 Math.floor(Math.random()*bodyCount);
+
+state.player.legs =
+Math.floor(Math.random()*legsCount);
 
 state.player.hair =
 Math.floor(Math.random()*hairCount);

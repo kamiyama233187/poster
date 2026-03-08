@@ -11,8 +11,10 @@
 position:absolute;
 left:0;
 top:0;
+
 width:64px;
 height:64px;
+
 object-fit:none;
 image-rendering:pixelated;
 }
@@ -21,8 +23,8 @@ image-rendering:pixelated;
 
 .tile{
   position:absolute;
-  width:64px;
-height:64px;
+  width:42px;
+height:42px;
   border:2px solid white;
   border-radius:50%;
   text-align:center;
@@ -386,8 +388,9 @@ Lv：<span id="level">1</span><br>
     <div id="player" class="player">
 
 <img id="playerBody">
-<img id="playerHair">
+<img id="playerLegs">
 <img id="playerClothes">
+<img id="playerHair">
 
 </div>
   </div>
@@ -471,12 +474,12 @@ let currentRouteEffect = null;
 const devMode = state.devMode === true;
 if(!state.player){
   state.player = {
-    avatar:"🧍",
-    hair:0,
-    face:0,
-    body:0,
-    armor:0
-  };
+avatar:"🧍",
+hair:0,
+body:0,
+legs:0,
+armor:0
+};
 }
 
 const STAGE_DATA = {
@@ -1905,11 +1908,16 @@ render();
 function renderPlayer(){
 
 const body = document.getElementById("playerBody");
+const legs = document.getElementById("playerLegs");
 const hair = document.getElementById("playerHair");
 const clothes = document.getElementById("playerClothes");
 
 body.src = "assets/body/body"+state.player.body+".png";
+
+legs.src = "assets/legs/legs"+state.player.legs+".png";
+
 hair.src = "assets/hair/hair"+state.player.hair+".png";
+
 clothes.src = "assets/clothes/clothes"+state.player.armor+".png";
 
 const frameX = walkFrame * 64;
