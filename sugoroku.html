@@ -446,7 +446,7 @@ if(currentUser && !state.employees[currentUser]){
 
 let currentBranch = null;
 let currentRouteEffect = null;
-const devMode = localStorage.getItem("devMode") === "true";
+const devMode = state.devMode === true;
 if(!state.player){
   state.player = {
     avatar:"🧍",
