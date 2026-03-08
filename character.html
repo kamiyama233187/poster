@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>キャラクター</title>
+
+<style>
+
+body{
+background:black;
+color:white;
+font-family:"MS Gothic";
+text-align:center;
+}
+
+.preview{
+width:96px;
+height:96px;
+margin:auto;
+position:relative;
+}
+
+.preview img{
+position:absolute;
+left:0;
+top:0;
+width:96px;
+height:96px;
+object-fit:none;
+image-rendering:pixelated;
+}
+
+select{
+margin:10px;
+font-size:16px;
+}
+
+button{
+margin-top:15px;
+padding:10px 20px;
+font-size:16px;
+background:black;
+color:white;
+border:2px solid white;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>キャラクターカスタム</h2>
+
+<div class="preview">
+
+<img id="body">
+<img id="hair">
+<img id="clothes">
+
+</div>
+
+<br>
+
+髪型
+<select id="hairSelect"></select>
+
+<br>
+
+服
+<select id="clothesSelect"></select>
+
+<br>
+
+<button onclick="saveChar()">保存</button>
+<button onclick="location.href='sugoroku.html'">戻る</button>
+
+<script>
+
+const STORAGE_KEY = "shukkinQuestData_v3";
+
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+if(!state.player){
+state.player = {
+body:0,
+hair:0,
+armor:0
+};
+}
+
+/* 選択肢 */
+
+const hairList = [0,1,2,3,4];
+const clothesList = [0,1,2,3];
+
+const hairSelect = document.getElementById("hairSelect");
+const clothesSelect = document.getElementById("clothesSelect");
+
+/* 髪型 */
+
+hairList.forEach(i=>{
+
+const op=document.createElement("option");
+
+op.value=i;
+op.text="Hair "+i;
+
+hairSelect.appendChild(op);
+
+});
+
+/* 服 */
+
+clothesList.forEach(i=>{
+
+const op=document.createElement("option");
+
+op.value=i;
+op.text="Clothes "+i;
+
+clothesSelect.appendChild(op);
+
+});
+
+/* 初期値 */
+
+hairSelect.value = state.player.hair;
+clothesSelect.value = state.player.armor;
+
+hairSelect.onchange = ()=>{
+state.player.hair = hairSelect.value;
+render();
+};
+
+clothesSelect.onchange = ()=>{
+state.player.armor = clothesSelect.value;
+render();
+};
+
+/* 描画 */
+
+function render(){
+
+const frameX = 0;
+const frameY = 0;
+
+const body = document.getElementById("body");
+const hair = document.getElementById("hair");
+const clothes = document.getElementById("clothes");
+
+body.src = "assets/body/" + state.player.body + ".png";
+hair.src = "assets/hair/" + state.player.hair + ".png";
+clothes.src = "assets/clothes/" + state.player.armor + ".png";
+
+body.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+hair.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+clothes.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+}
+
+/* 保存 */
+
+function saveChar(){
+
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+alert("保存しました");
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
