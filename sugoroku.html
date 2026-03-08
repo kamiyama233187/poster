@@ -736,6 +736,14 @@ if(!currentTile.next || currentTile.next.length === 0){
 
 clearInterval(moveInterval);
 player.classList.remove("walk");
+
+const tileType =
+state.sugoroku.tiles[state.sugoroku.position]?.type;
+
+setTimeout(()=>{
+handleEvent(tileType);
+},400);
+
 return;
 
 }
@@ -744,8 +752,6 @@ nextPos = currentTile.next[0];
 
 // マップ終端安全処理
 if(nextPos >= state.sugoroku.tiles.length){
-
-if(!currentTile.next || currentTile.next.length === 0){
 
 clearInterval(moveInterval);
 player.classList.remove("walk");
