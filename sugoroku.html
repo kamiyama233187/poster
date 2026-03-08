@@ -445,6 +445,7 @@ if(currentUser && !state.employees[currentUser]){
 }
 
 let currentBranch = null;
+let currentRouteEffect = null;
 if(!state.player){
   state.player = {
     avatar:"🧍",
@@ -596,6 +597,8 @@ const STAGE_TILE_RATE = {
     cave:0.10
   }
 };
+
+
 
 let devMode = state.devMode || false;
 if(devMode){
@@ -1132,6 +1135,22 @@ state.sugoroku.tiles[goalIndex].next = [];
 /* マスイベントランダム */
 
 const rate = STAGE_TILE_RATE[stage];
+let rateMod = {...rate};
+
+if(currentRouteEffect==="safe"){
+rateMod.heal *= 2;
+rateMod.boss *= 0.5;
+}
+
+if(currentRouteEffect==="danger"){
+rateMod.boss *= 2;
+rateMod.minus *= 1.5;
+}
+
+if(currentRouteEffect==="treasure"){
+rateMod.rare *= 2;
+rateMod.plus *= 1.5;
+}
 
 state.sugoroku.tiles.forEach(tile=>{
 
@@ -1139,12 +1158,12 @@ if(tile.type!=="none") return;
 
 const r=Math.random();
 
-if(r<rate.plus) tile.type="plus";
+if(r<rateMod.plus) tile.type="plus";
 else if(r<rate.plus+rate.minus) tile.type="minus";
-else if(r<rate.plus+rate.minus+rate.rare) tile.type="rare";
-else if(r<rate.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
-else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
-else if(r<rate.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
+else if(r<rateMod.plus+rate.minus+rate.rare) tile.type="rare";
+else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal) tile.type="heal";
+else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal+rate.boss) tile.type="boss";
+else if(r<rateMod.plus+rate.minus+rate.rare+rate.heal+rate.boss+rate.cave) tile.type="cave";
 
 });
 
@@ -1660,6 +1679,7 @@ function chooseBranch(index){
 if(currentBranch && currentBranch.routeType){
 
 const type = currentBranch.routeType[index];
+currentRouteEffect = type;
 
 if(type==="safe"){
 showMessage("🛡 安全ルートを進む！");
