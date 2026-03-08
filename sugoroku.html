@@ -394,13 +394,11 @@ Lv：<span id="level">1</span><br>
 
 <div id="devTools" style="display:none; margin-top:10px;">
 
-  <input type="number" id="devSteps" placeholder="移動数" style="width:80px;">
-  <button onclick="devRoll()">指定移動</button>
+<input type="number" id="devSteps" placeholder="移動数" style="width:80px;">
+<button onclick="devRoll()">指定移動</button>
 
-  <button onclick="forceGoal()">強制ゴール</button>
-  <button onclick="warpTo(29)">29へワープ</button>
-
-</div>
+<button onclick="forceGoal()">強制ゴール</button>
+<button onclick="warpTo(29)">29へワープ</button>
 
 <hr style="margin:10px 0; border-color:white;">
 
@@ -413,6 +411,8 @@ Lv：<span id="level">1</span><br>
 <button onclick="devHp(-10)">💔 HP -10</button>
 <button onclick="devFullHp()">💯 HP全回復</button>
 <button onclick="regenerateMap()">🗺 マップ再生成</button>
+
+</div>
 
 <div class="center">
   <button onclick="location.href='index.html'">
@@ -445,8 +445,8 @@ if(currentUser && !state.employees[currentUser]){
 }
 
 let currentBranch = null;
-let currentRouteEffect = null
-const devMode = false;
+let currentRouteEffect = null;
+const devMode = localStorage.getItem("devMode") === "true";
 if(!state.player){
   state.player = {
     avatar:"🧍",
