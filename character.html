@@ -36,8 +36,8 @@ height:256px;
 
 image-rendering:pixelated;
 
-/* 正面だけ表示 */
-transform:scale(2) translate(-96px,-192px);
+/* 正面 */
+transform:scale(2) translate(-64px,-192px);
 transform-origin:top left;
 }
 
@@ -70,6 +70,10 @@ margin:10px;
 .parts img{
 width:48px;
 height:48px;
+
+object-fit:none;
+object-position:-64px -160px;
+
 image-rendering:pixelated;
 cursor:pointer;
 border:1px solid #444;
