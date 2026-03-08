@@ -412,9 +412,6 @@ if(currentUser && !state.employees[currentUser]){
   };
 }
 
-const CAMERA_BACK = 2;
-const CAMERA_FRONT = 5;
-
 let currentBranch = null;
 if(!state.player){
   state.player = {
@@ -444,13 +441,6 @@ const STAGE_DATA = {
   }
 };
 
-const STAGE_MAP_LENGTH = {
- 1:60,
- 2:70,
- 3:80,
- 4:70,
- 5:80
-};
 
 const STAGE_PATH = {
 
@@ -688,10 +678,6 @@ player.classList.remove("walk");
 const tileType =
 state.sugoroku.tiles[state.sugoroku.position]?.type;
 
-if(state.sugoroku.tiles[state.sugoroku.position].type==="goal"){
-handleEvent("goal");
-}
-
 setTimeout(()=>{
 
 handleEvent(tileType);
@@ -898,6 +884,19 @@ const hpPercent =
 document.getElementById("hpBar").style.width =
 hpPercent+"%";
 
+// HP0チェック
+if(state.sugoroku.hp <= 0){
+
+showMessage("💀 力尽きてしまった…");
+
+state.sugoroku.hp = state.sugoroku.maxHp;
+state.sugoroku.position = 0;
+
+save();
+setTimeout(render,500);
+
+}
+
 
 /* ===================
 ミニマップ
@@ -905,11 +904,26 @@ hpPercent+"%";
 
 drawMiniMap();
 
-/* ===================
-森
-=================== */
+function generateTrees(){
 
-drawTrees();
+const mapLayer = document.getElementById("mapLayer");
+
+for(let i=0;i<40;i++){
+
+const tree=document.createElement("div");
+
+tree.className="tree";
+tree.textContent="🌳";
+
+tree.style.position="absolute";
+tree.style.left=Math.random()*4800+"px";
+tree.style.top=Math.random()*2800+"px";
+tree.style.opacity="0.35";
+
+mapLayer.appendChild(tree);
+
+}
+
 }
 
 function generateMap(){
@@ -1104,11 +1118,7 @@ function handleEvent(type){
     alert("ログイン情報がありません");
     return;
   }
-let routeEffect=null;
 
-if(currentBranch && currentBranch.routeType){
-routeEffect=currentBranch.routeType[0];
-}
 
   const emp = state.employees[currentUser];
 
@@ -1421,8 +1431,9 @@ function devRoll(){
   if(isNaN(val)) return;
 
   state.sugoroku.position += val;
-
-  const length = STAGE_MAP_LENGTH[state.sugoroku.stage];
+  
+ const length = state.sugoroku.tiles.length;
+ 
 
 if(state.sugoroku.position >= length){
     state.sugoroku.position = 0;
@@ -1435,7 +1446,7 @@ if(state.sugoroku.position >= length){
 
 function forceGoal(){
 
-const length = STAGE_MAP_LENGTH[state.sugoroku.stage];
+const length = state.sugoroku.tiles.length;
 
 state.sugoroku.position = length - 1;
 
@@ -1455,6 +1466,7 @@ if(!state.sugoroku.tiles || state.sugoroku.tiles.length === 0){
 }
 
 render();
+generateTrees();
 
 function devTrigger(type){
 
@@ -1691,29 +1703,7 @@ render();
 
 }
 
-function drawTrees(){
 
-const mapLayer = document.getElementById("mapLayer");
-
-document.querySelectorAll(".tree").forEach(t=>t.remove());
-
-for(let i=0;i<40;i++){
-
-const tree=document.createElement("div");
-
-tree.className="tree";
-tree.textContent="🌳";
-
-tree.style.position="absolute";
-tree.style.left=Math.random()*4800+"px";
-tree.style.top=Math.random()*2800+"px";
-tree.style.opacity="0.35";
-
-mapLayer.appendChild(tree);
-
-}
-
-}
 
  // バージョン
 const version = localStorage.getItem("appVersion");
