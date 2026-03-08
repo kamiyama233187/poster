@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャラカスタム</title>
+
+<style>
+
+body{
+background:black;
+color:white;
+font-family:monospace;
+text-align:center;
+}
+
+/* プレビュー */
+
+.preview{
+width:192px;
+height:192px;
+margin:auto;
+position:relative;
+overflow:hidden;
+border:2px solid white;
+}
+
+.preview img{
+position:absolute;
+left:0;
+top:0;
+
+width:192px;
+height:256px;
+
+image-rendering:pixelated;
+
+/* 正面(4行目) */
+transform:scale(3) translateY(-192px);
+transform-origin:top left;
+}
+
+/* パーツ一覧 */
+
+.parts{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:6px;
+max-height:200px;
+overflow:auto;
+border:2px solid white;
+padding:10px;
+margin:10px;
+}
+
+.parts img{
+width:48px;
+height:48px;
+image-rendering:pixelated;
+cursor:pointer;
+border:1px solid #444;
+}
+
+.parts img:hover{
+border:1px solid white;
+}
+
+/* ボタン */
+
+button{
+background:black;
+color:white;
+border:2px solid white;
+padding:8px 15px;
+margin:6px;
+font-size:16px;
+}
+
+button:active{
+background:white;
+color:black;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>キャラクターカスタム</h2>
+
+<div class="preview">
+
+<img id="body">
+<img id="hair">
+<img id="clothes">
+
+</div>
+
+<br>
+
+<button onclick="randomChar()">🎲 ランダム</button>
+<button onclick="saveChar()">保存</button>
+<button onclick="location.href='sugoroku.html'">戻る</button>
+
+<h3>体</h3>
+<div id="bodyList" class="parts"></div>
+
+<h3>髪型</h3>
+<div id="hairList" class="parts"></div>
+
+<h3>服</h3>
+<div id="clothesList" class="parts"></div>
+
+<script>
+
+const STORAGE_KEY = "shukkinQuestData_v3";
+
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+if(!state.player){
+state.player = {
+body:0,
+hair:0,
+armor:0
+};
+}
+
+/* 数 */
+
+const bodyCount = 52;
+const hairCount = 416;
+const clothesCount = 562;
+
+/* リスト */
+
+const bodyList=document.getElementById("bodyList");
+const hairList=document.getElementById("hairList");
+const clothesList=document.getElementById("clothesList");
+
+/* body */
+
+for(let i=0;i<bodyCount;i++){
+
+const img=document.createElement("img");
+
+img.src="assets/body/body"+i+".png";
+
+img.onclick=()=>{
+
+state.player.body=i;
+
+render();
+
+};
+
+bodyList.appendChild(img);
+
+}
+
+/* hair */
+
+for(let i=0;i<hairCount;i++){
+
+const img=document.createElement("img");
+
+img.src="assets/hair/hair"+i+".png";
+
+img.onclick=()=>{
+
+state.player.hair=i;
+
+render();
+
+};
+
+hairList.appendChild(img);
+
+}
+
+/* clothes */
+
+for(let i=0;i<clothesCount;i++){
+
+const img=document.createElement("img");
+
+img.src="assets/clothes/clothes"+i+".png";
+
+img.onclick=()=>{
+
+state.player.armor=i;
+
+render();
+
+};
+
+clothesList.appendChild(img);
+
+}
+
+/* 描画 */
+
+function render(){
+
+document.getElementById("body").src =
+"assets/body/body"+state.player.body+".png";
+
+document.getElementById("hair").src =
+"assets/hair/hair"+state.player.hair+".png";
+
+document.getElementById("clothes").src =
+"assets/clothes/clothes"+state.player.armor+".png";
+
+}
+
+/* ランダム */
+
+function randomChar(){
+
+state.player.body =
+Math.floor(Math.random()*bodyCount);
+
+state.player.hair =
+Math.floor(Math.random()*hairCount);
+
+state.player.armor =
+Math.floor(Math.random()*clothesCount);
+
+render();
+
+}
+
+/* 保存 */
+
+function saveChar(){
+
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+alert("保存しました");
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>

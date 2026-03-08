@@ -7,12 +7,22 @@
 
 <style>
 
+.player img{
+position:absolute;
+left:0;
+top:0;
+width:64px;
+height:64px;
+object-fit:none;
+image-rendering:pixelated;
+}
+
 /* マスを丸くしてドラクエ風 */
 
 .tile{
   position:absolute;
-  width:48px;
-  height:48px;
+  width:64px;
+height:64px;
   border:2px solid white;
   border-radius:50%;
   text-align:center;
@@ -373,10 +383,18 @@ Lv：<span id="level">1</span><br>
 <div class="map">
   <div id="mapLayer">
     <div id="map"></div>
-    <div id="player" class="player">🧍</div>
+    <div id="player" class="player">
+
+<img id="playerBody">
+<img id="playerHair">
+<img id="playerClothes">
+
+</div>
   </div>
 </div>
-
+<button onclick="location.href='character.html'">
+キャラクター
+</button>
 </div>
 
 <div id="dqMessage" class="window center" style="display:none;"></div>
@@ -428,6 +446,7 @@ const STORAGE_KEY = "shukkinQuestData_v3";
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
+
 const currentUser = state.currentUser || null;
 
 // employeesが存在しない場合
@@ -445,6 +464,9 @@ if(currentUser && !state.employees[currentUser]){
 }
 
 let currentBranch = null;
+let walkFrame = 0;
+let direction = 0; 
+// 0=下 1=左 2=右 3=上
 let currentRouteEffect = null;
 const devMode = state.devMode === true;
 if(!state.player){
@@ -747,8 +769,15 @@ handleEvent(tileType);
 return;
 
 }
-
 nextPos = currentTile.next[0];
+
+const current = state.sugoroku.tiles[state.sugoroku.position];
+const next = state.sugoroku.tiles[nextPos];
+
+if(next.x > current.x) direction = 2;
+else if(next.x < current.x) direction = 1;
+else if(next.y > current.y) direction = 0;
+else if(next.y < current.y) direction = 3;
 
 // マップ終端安全処理
 if(nextPos >= state.sugoroku.tiles.length){
@@ -774,6 +803,8 @@ steps++;
 walkSE.currentTime=0;
 walkSE.play();
 
+updateWalkFrame();
+
 render();
 
 // 歩数終了
@@ -797,6 +828,18 @@ save();
 }
 
 },200);
+
+}
+
+function updateWalkFrame(){
+
+walkFrame++;
+
+if(walkFrame > 2){
+walkFrame = 0;
+}
+
+renderPlayer();
 
 }
 
@@ -1017,7 +1060,7 @@ setTimeout(render,500);
 /* ===================
 ミニマップ
 =================== */
-
+renderPlayer();
 drawMiniMap();
 }
 
@@ -1859,6 +1902,29 @@ render();
 
 }
 
+function renderPlayer(){
+
+const body = document.getElementById("playerBody");
+const hair = document.getElementById("playerHair");
+const clothes = document.getElementById("playerClothes");
+
+body.src = "assets/body/body"+state.player.body+".png";
+hair.src = "assets/hair/hair"+state.player.hair+".png";
+clothes.src = "assets/clothes/clothes"+state.player.armor+".png";
+
+const frameX = walkFrame * 64;
+const frameY = direction * 64;
+
+body.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+hair.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+clothes.style.objectPosition =
+"-"+frameX+"px -"+frameY+"px";
+
+}
 
 
  // バージョン
