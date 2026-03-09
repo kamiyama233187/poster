@@ -13,6 +13,7 @@ height:64px;
 position:relative;
 overflow:hidden;
 z-index:5;
+transition:left 0.18s linear, top 0.18s linear;
 }
 
 .player img{
@@ -805,11 +806,10 @@ return;
 state.sugoroku.position = nextPos;
 
 steps++;
+updateWalkFrame();
 
 walkSE.currentTime=0;
 walkSE.play();
-
-updateWalkFrame();
 
 render();
 
