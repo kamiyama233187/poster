@@ -3120,20 +3120,23 @@ function showDQMessage(text, duration = 3000){
 }
 
 function showEmpTab(id){
+
 playCursor();
 
-  const tabs = ["empQuest","empShop","empRanking","empTitles","empFacing"];
+const tabs = ["empQuest","empShop","empRanking","empTitles","empFacing"];
 
-  tabs.forEach(t=>{
-    const el = document.getElementById(t);
-    if(el) el.classList.add("hidden");
-  });
-  if(id==="empFacing"){
+tabs.forEach(t=>{
+const el = document.getElementById(t);
+if(el) el.classList.add("hidden");
+});
+
+document.getElementById(id).classList.remove("hidden");
+
+if(id==="empFacing"){
 initFacingShelves();
 renderFacingProgress();
 }
 
-  document.getElementById(id).classList.remove("hidden");
 }
 
 if ("serviceWorker" in navigator) {
