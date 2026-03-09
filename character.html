@@ -255,17 +255,25 @@ clothesList.appendChild(img);
 
 function render(){
 
-document.getElementById("body").src =
-"assets/body/body"+state.player.body+".png";
+const body = document.getElementById("body");
+const legs = document.getElementById("legs");
+const hair = document.getElementById("hair");
+const clothes = document.getElementById("clothes");
 
-document.getElementById("legs").src =
-"assets/legs/legs"+state.player.legs+".png";
+body.src = "assets/body/body"+state.player.body+".png";
+legs.src = "assets/legs/legs"+state.player.legs+".png";
+hair.src = "assets/hair/hair"+state.player.hair+".png";
+clothes.src = "assets/clothes/clothes"+state.player.armor+".png";
 
-document.getElementById("hair").src =
-"assets/hair/hair"+state.player.hair+".png";
+/* 正面フレーム固定 */
 
-document.getElementById("clothes").src =
-"assets/clothes/clothes"+state.player.armor+".png";
+body.style.objectPosition = "-64px -128px";
+hair.style.objectPosition = "-64px -128px";
+clothes.style.objectPosition = "-64px -128px";
+
+/* 足は中央 */
+
+legs.style.objectPosition = "-64px -128px";
 
 highlightSelection();
 
