@@ -2014,56 +2014,57 @@ function exportExchangeHistoryCSV(){
 
 function renderRanking(){
 
-  const container = document.getElementById("rankingList");
-  if(!container) return;
+const container = document.getElementById("rankingList");
+if(!container) return;
 
-  container.innerHTML="";
+container.innerHTML="";
 
 const arr = Object.entries(state.employees)
-  .map(([code,emp])=>({
-    code,
-    name:emp.name,
-    pt:emp.totalPoints||0,
-    laps: emp.sugorokuLaps || 0
-  }))
-
-    .sort((a,b)=>{
-  if(b.pt !== a.pt){
-    return b.pt - a.pt;
-  }
-  return b.laps - a.laps;
+.map(([code,emp])=>({
+code,
+name:emp.name,
+pt:emp.totalPoints||0,
+laps: emp.sugorokuLaps || 0
+}))
+.sort((a,b)=>{
+if(b.pt !== a.pt){
+return b.pt - a.pt;
+}
+return b.laps - a.laps;
 })
-    .slice(0,3);
+.slice(0,3);
 
-  arr.forEach((e,i)=>{
+arr.forEach((e,i)=>{
 
-    const emp = state.employees[e.code];
+const emp = state.employees[e.code];
 
-    let titleText = "";
-    let rarityClass = "title-R";
+let titleText = "";
+let rarityClass = "title-R";
 
-    if(emp.equippedTitle){
+if(emp.equippedTitle){
 
-      if(emp.equippedTitle.type === "title"){
-        const master = TITLE_MASTER[emp.equippedTitle.id];
-        if(master){
-          titleText = master.name;
-          rarityClass = "title-" + master.rarity;
-        }
-      }
+if(emp.equippedTitle.type === "title"){
+const master = TITLE_MASTER[emp.equippedTitle.id];
+if(master){
+titleText = master.name;
+rarityClass = "title-" + master.rarity;
+}
+}
 
-      if(emp.equippedTitle.type === "level"){
-        titleText = getTitle(emp.equippedTitle.level);
+if(emp.equippedTitle.type === "level"){
+titleText = getTitle(emp.equippedTitle.level);
 
-        const lv = emp.equippedTitle.level;
-        if(lv >= 90) rarityClass="title-UR";
-        else if(lv >= 70) rarityClass="title-SSR";
-        else if(lv >= 50) rarityClass="title-SR";
-      }
+const lv = emp.equippedTitle.level;
+if(lv >= 90) rarityClass="title-UR";
+else if(lv >= 70) rarityClass="title-SSR";
+else if(lv >= 50) rarityClass="title-SR";
+}
 
-    }
+}
 
-    const row = document.createElement("div");
+const levelData = getLevelInfo(emp.totalEarned || 0);
+
+const row = document.createElement("div");
 row.className="item";
 
 row.innerHTML = `
@@ -2080,80 +2081,74 @@ ${i+1}位 🏆 Lv.${levelData.level} ${e.name}
 `;
 
 const char = createRankCharacter(emp.player || {});
-row.prepend(char);   // ←ここ変更
+row.prepend(char);
 
 container.appendChild(row);
+
 });
+
 }
 
 function renderEmployeeRanking(){
 
-  const container = document.getElementById("rankingListEmployee");
-  if(!container) return;
+const container = document.getElementById("rankingListEmployee");
+if(!container) return;
 
-  container.innerHTML="";
+container.innerHTML="";
 
 const arr = Object.entries(state.employees)
-  .map(([code,emp])=>({
-    code,
-    name:emp.name,
-    pt:emp.totalPoints||0,
-    laps: emp.sugorokuLaps || 0
-  }))
-       .sort((a,b)=>{
-  if(b.pt !== a.pt){
-    return b.pt - a.pt;
-  }
-  return b.laps - a.laps;
-})
+.map(([code,emp])=>({
+code,
+name:emp.name,
+pt:emp.totalPoints||0,
+laps: emp.sugorokuLaps || 0
+}))
+.sort((a,b)=>{
+if(b.pt !== a.pt){
+return b.pt - a.pt;
+}
+return b.laps - a.laps;
+});
 
-  arr.forEach((e,i)=>{
+arr.forEach((e,i)=>{
 
-    const emp = state.employees[e.code];
+const emp = state.employees[e.code];
 
-    let titleText = "";
-    let rarityClass = "title-R";
+let titleText = "";
+let rarityClass = "title-R";
 
-    if(emp.equippedTitle){
+if(emp.equippedTitle){
 
-      if(emp.equippedTitle.type === "title"){
-        const master = TITLE_MASTER[emp.equippedTitle.id];
-        if(master){
-          titleText = master.name;
-          rarityClass = "title-" + master.rarity;
-        }
-      }
+if(emp.equippedTitle.type === "title"){
+const master = TITLE_MASTER[emp.equippedTitle.id];
+if(master){
+titleText = master.name;
+rarityClass = "title-" + master.rarity;
+}
+}
 
-      if(emp.equippedTitle.type === "level"){
-        titleText = getTitle(emp.equippedTitle.level);
+if(emp.equippedTitle.type === "level"){
+titleText = getTitle(emp.equippedTitle.level);
 
-        const lv = emp.equippedTitle.level;
-        if(lv >= 90) rarityClass="title-UR";
-        else if(lv >= 70) rarityClass="title-SSR";
-        else if(lv >= 50) rarityClass="title-SR";
-      }
+const lv = emp.equippedTitle.level;
+if(lv >= 90) rarityClass="title-UR";
+else if(lv >= 70) rarityClass="title-SSR";
+else if(lv >= 50) rarityClass="title-SR";
+}
 
-    }else{
-      const levelInfo = getLevelInfo(emp.totalEarned || 0);
-      titleText = levelInfo.title;
-    }
+}else{
+const levelInfo = getLevelInfo(emp.totalEarned || 0);
+titleText = levelInfo.title;
+}
 
-    // ⭐ ここで先にレベル取得
-    const levelData = getLevelInfo(emp.totalEarned || 0);
+const levelData = getLevelInfo(emp.totalEarned || 0);
 
-    const row = document.createElement("div");
+const row = document.createElement("div");
 row.className="item";
 
 row.innerHTML = `
-<div>${i+1}位</div>
-`;
-
-const char = createRankCharacter(emp.player || {});
-row.appendChild(char);
-
-const info = document.createElement("div");
-info.innerHTML = `
-Lv.${levelData.level} ${e.name}
+<div>
+${i+1}位 🏆 Lv.${levelData.level} ${e.name}
 <div class="${rarityClass}" style="font-size:12px;">
 【${titleText}】
 </div>
@@ -2161,15 +2156,16 @@ Lv.${levelData.level} ${e.name}
 <div style="font-size:12px;">
 🎲 ${e.laps}周
 </div>
+</div>
 `;
 
-row.appendChild(info);
-
 const char = createRankCharacter(emp.player || {});
-row.appendChild(char);
+row.prepend(char);
 
 container.appendChild(row);
+
 });
+
 }
 function renderTitles(){
 
