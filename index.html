@@ -816,6 +816,7 @@ border-top:none;
   </div>
   
   <!-- ===== 前陳タブ ===== -->
+  <div id="facingProgress"></div>
 <div id="empFacing" class="card hidden">
 
 <h3>前陳チェック</h3>
@@ -1273,6 +1274,59 @@ sugoroku100:{
 };
 
 /* ================= STATE ================= */
+const SHELF_AREA = {
+
+op1:"OP",
+op2:"OP",
+op3:"OP",
+op4:"OP",
+op5:"OP",
+op6:"OP",
+op7:"OP",
+
+rice:"rice",
+
+dessert:"dessert",
+yogurt:"dessert",
+milk:"dessert",
+platform1:"dessert",
+
+poke_snack:"poke",
+poke_season:"poke",
+platform2:"poke",
+
+nl_sweets:"nl",
+nl_original:"nl",
+nl_bakery:"nl",
+nl_snack:"nl",
+rare:"nl",
+
+soup:"cup",
+cup:"cup",
+muji:"cup",
+
+daily1:"daily",
+daily2:"daily",
+daily3:"daily",
+daily4:"daily",
+daily5:"daily",
+book:"daily",
+
+frozen1:"frozen",
+frozen2:"frozen",
+frozen3:"frozen",
+
+alcohol1:"alcohol",
+alcohol2:"alcohol",
+alcohol3:"alcohol",
+
+softdrink1:"drink",
+softdrink2:"drink",
+softdrink3:"drink",
+softdrink4:"drink"
+
+};
+
 const FACING_SHELVES = [
 
   {id:"s1", name:"米飯"},
@@ -1342,23 +1396,31 @@ function playBattleEnd(){
 }
 /* ================= UTIL ================= */
 
-function saveFacingRecord(shelfId, image){
+function saveFacingRecord(shelfId,image){
 
-  const date = todayStr();
+const date = todayStr();
 
-  if(!state.facing.records[date]){
-    state.facing.records[date] = [];
-  }
-
-  state.facing.records[date].push({
-    shelf:shelfId,
-    employee:currentUser,
-    image:image,
-    time:new Date().toLocaleTimeString()
-  });
-
-  save();
+if(!state.facing.records[date]){
+state.facing.records[date] = [];
 }
+
+const area = SHELF_AREA[shelfId] || "unknown";
+
+state.facing.records[date].push({
+
+shelf:shelfId,
+area:area,
+employee:currentUser,
+image:image,
+time:new Date().toLocaleTimeString()
+
+});
+
+save();
+
+}
+
+
 
 function todayStr(){
 
@@ -3080,6 +3142,10 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js?v=" + APP_VERSION);
 }
 
+if(id==="empFacing"){
+renderFacingProgress();
+}
+
 function getNextLevelRequirement(total){
 
   const info = getLevelInfo(total);
@@ -3630,6 +3696,50 @@ const today=todayStr();
 state.facing.records[today][index].comment=val;
 
 save();
+
+}
+
+function getFacingProgress(){
+
+const today=todayStr();
+
+const records=state.facing.records[today]||[];
+
+const areas={};
+
+records.forEach(r=>{
+areas[r.area]=true;
+});
+
+const totalAreas=new Set(Object.values(SHELF_AREA)).size;
+
+const doneAreas=Object.keys(areas).length;
+
+const percent=Math.floor((doneAreas/totalAreas)*100);
+
+return{
+done:doneAreas,
+total:totalAreas,
+percent:percent
+};
+
+}
+
+function renderFacingProgress(){
+
+const p=getFacingProgress();
+
+const el=document.getElementById("facingProgress");
+
+if(!el) return;
+
+el.innerHTML=`
+
+前陳達成率  
+${p.done}/${p.total}  
+(${p.percent}%)
+
+`;
 
 }
 
