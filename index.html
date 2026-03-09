@@ -96,8 +96,8 @@ button:active{
 
 .item{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  gap:10px;
   padding:4px 0;
 }
 
@@ -2080,7 +2080,7 @@ ${i+1}位 🏆 Lv.${levelData.level} ${e.name}
 `;
 
 const char = createRankCharacter(emp.player || {});
-row.prepend(char);   // ←ここ
+row.prepend(char);   // ←ここ変更
 
 container.appendChild(row);
 });
@@ -2145,8 +2145,15 @@ const arr = Object.entries(state.employees)
 row.className="item";
 
 row.innerHTML = `
-<div>
-${i+1}位 Lv.${levelData.level} ${e.name}
+<div>${i+1}位</div>
+`;
+
+const char = createRankCharacter(emp.player || {});
+row.appendChild(char);
+
+const info = document.createElement("div");
+info.innerHTML = `
+Lv.${levelData.level} ${e.name}
 <div class="${rarityClass}" style="font-size:12px;">
 【${titleText}】
 </div>
@@ -2154,11 +2161,12 @@ ${i+1}位 Lv.${levelData.level} ${e.name}
 <div style="font-size:12px;">
 🎲 ${e.laps}周
 </div>
-</div>
 `;
 
+row.appendChild(info);
+
 const char = createRankCharacter(emp.player || {});
-row.prepend(char);
+row.appendChild(char);
 
 container.appendChild(row);
 });
