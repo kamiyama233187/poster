@@ -373,6 +373,7 @@ input{
   border-radius:12px;
   width:320px;
   max-width:90%;
+  position:relative;
 }
 
 .modalHeader{
@@ -649,6 +650,63 @@ min-width:auto;
 padding:12px;
 font-size:13px;
 
+}
+
+#cameraModal video{
+
+width:100%;
+border-radius:8px;
+
+}
+
+#cameraGuide{
+
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+
+}
+
+/* 角マーカー */
+
+.guideCorner{
+
+position:absolute;
+width:40px;
+height:40px;
+border:4px solid #00ffcc;
+
+}
+
+.tl{
+top:20px;
+left:20px;
+border-right:none;
+border-bottom:none;
+}
+
+.tr{
+top:20px;
+right:20px;
+border-left:none;
+border-bottom:none;
+}
+
+.bl{
+bottom:20px;
+left:20px;
+border-right:none;
+border-top:none;
+}
+
+.br{
+bottom:20px;
+right:20px;
+border-left:none;
+border-top:none;
 }
 
 </style>
@@ -3513,6 +3571,14 @@ document.getElementById("cameraVideo").style.display="block";
   <div class="modalBox">
 
     <video id="cameraVideo" autoplay playsinline style="width:100%"></video>
+    <div id="cameraGuide">
+
+<div class="guideCorner tl"></div>
+<div class="guideCorner tr"></div>
+<div class="guideCorner bl"></div>
+<div class="guideCorner br"></div>
+
+</div>
 
     <canvas id="cameraCanvas" style="display:none"></canvas>
 
