@@ -1607,6 +1607,7 @@ if(now.getHours() === 7 && now.getMinutes() === 0){
 
   showEmployee();   // ← 先に画面切り替え
 checkSugorokuTitles(code);
+showFacingFeedback();
 
   if(!isShiftDay()){
     showDQMessage("きょうは やすみのひ だった！");
@@ -3635,16 +3636,71 @@ document.getElementById("cameraVideo").style.display="block";
 function renderFacingReview(){
 
 const container=document.getElementById("facingReviewList");
-
 if(!container) return;
 
 container.innerHTML="";
 
 const today=todayStr();
-
 const records=state.facing.records[today]||[];
 
+/* 撮影者ごとにまとめる */
+
+const groups={};
+
 records.forEach((r,i)=>{
+
+if(!groups[r.employee]){
+groups[r.employee]=[];
+}
+
+groups[r.employee].push({
+...r,
+index:i
+});
+
+});
+
+/* 一覧表示 */
+
+Object.entries(groups).forEach(([emp,list])=>{
+
+const name=state.employees[emp]?.name||emp;
+
+const row=document.createElement("div");
+row.className="card";
+
+row.style.cursor="pointer";
+
+row.innerHTML=`
+<div>
+<strong>${name}</strong>
+<div>${list.length}枚</div>
+</div>
+`;
+
+row.onclick=()=>{
+showFacingDetail(emp,list);
+};
+
+container.appendChild(row);
+
+});
+
+}
+
+function showFacingDetail(emp,list){
+
+const container=document.getElementById("facingReviewList");
+
+container.innerHTML="";
+
+const back=document.createElement("button");
+back.textContent="← 戻る";
+back.onclick=renderFacingReview;
+
+container.appendChild(back);
+
+list.forEach(r=>{
 
 const row=document.createElement("div");
 row.className="card";
@@ -3652,7 +3708,6 @@ row.className="card";
 row.innerHTML=`
 
 <div>棚：${r.shelf}</div>
-<div>撮影者：${state.employees[r.employee]?.name||r.employee}</div>
 <div>${r.time}</div>
 
 <img src="${r.image}" style="width:100%;margin-top:6px">
@@ -3660,7 +3715,7 @@ row.innerHTML=`
 <div style="margin-top:6px">
 
 評価
-<select onchange="setFacingScore(${i},this.value)">
+<select onchange="setFacingScore(${r.index},this.value)">
 
 <option value="">--</option>
 <option value="0">0</option>
@@ -3681,7 +3736,7 @@ row.innerHTML=`
 
 <textarea
 placeholder="コメント"
-onchange="setFacingComment(${i},this.value)"
+onchange="setFacingComment(${r.index},this.value)"
 style="width:100%;margin-top:4px"></textarea>
 
 `;
@@ -3792,6 +3847,30 @@ const records = state.facing.records[today] || [];
 
 records.forEach(r=>{
 markAreaDone(r.area);
+});
+
+}
+
+function showFacingFeedback(){
+
+const today=todayStr();
+
+const records=state.facing.records[today]||[];
+
+const my=records.filter(r=>r.employee===currentUser);
+
+if(!my.length) return;
+
+my.forEach(r=>{
+
+if(r.score===undefined) return;
+
+showDQMessage(
+
+`前陳評価\n${r.area}\n評価:${r.score}\n${r.comment||""}`
+
+);
+
 });
 
 }
