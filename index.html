@@ -1023,6 +1023,7 @@ function getYesterdayStr(){
 /* ================= LOGIN ================= */
 
 function login(){
+  load();
   playDecision();
 
   const code = document.getElementById("loginCode").value.trim();
@@ -1114,7 +1115,6 @@ hair: saved.player.hair || 0
 save();
 }
 }
-
 window.addEventListener("visibilitychange", () => {
 
 if(!document.hidden){
@@ -1123,6 +1123,15 @@ renderRanking();
 renderEmployeeRanking();
 
 }
+
+});
+
+window.addEventListener("pageshow", () => {
+
+load();
+
+renderRanking();
+renderEmployeeRanking();
 
 });
 
