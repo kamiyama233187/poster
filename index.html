@@ -1115,6 +1115,17 @@ save();
 }
 }
 
+window.addEventListener("visibilitychange", () => {
+
+if(!document.hidden){
+
+renderRanking();
+renderEmployeeRanking();
+
+}
+
+});
+
 function logout(){
   currentUser=null;
   isAdmin=false;
@@ -2991,6 +3002,7 @@ div.innerHTML = `
 return div;
 
 }
+
 
 </script>
 
