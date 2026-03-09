@@ -8,6 +8,26 @@
 <title>出勤クエスト_dev</title>
 
 <style>
+.rankChar{
+width:48px;
+height:48px;
+position:relative;
+margin-right:6px;
+}
+
+.rankChar img{
+position:absolute;
+left:0;
+top:0;
+
+width:192px;
+height:256px;
+
+image-rendering:pixelated;
+
+transform:scale(0.5) translate(-64px,-192px);
+transform-origin:top left;
+}
 .hidden{
   display:none !important;
 }
@@ -662,11 +682,6 @@ localStorage.setItem("appVersion", APP_VERSION);
     .textContent = "v" + APP_VERSION;
 
 const VERSION_HISTORY = [
-   {
-    version:"1.3.0",
-    date:"2026-03-08",
-    content:["キャラクリ搭載"]
-  },
  {
     version:"1.2.2",
     date:"2026-03-04",
@@ -1080,6 +1095,11 @@ checkSugorokuTitles(code);
   if(!isShiftDay()){
     showDQMessage("きょうは やすみのひ だった！");
   }
+  if(!state.employees[code].player){
+state.employees[code].player =
+JSON.parse(localStorage.getItem("shukkinQuestData_v3"))?.player || {};
+save();
+}
 }
 
 function logout(){
@@ -2036,6 +2056,8 @@ const arr = Object.entries(state.employees)
 
     const row = document.createElement("div");
     row.className="item";
+    const char = createRankCharacter(emp.player || {});
+row.appendChild(char);
 
    const levelData = getLevelInfo(emp.totalEarned || 0);
 
@@ -2114,6 +2136,8 @@ const arr = Object.entries(state.employees)
 
     const row = document.createElement("div");
     row.className="item";
+    const char = createRankCharacter(emp.player || {});
+row.appendChild(char);
 
     if(e.code === currentUser){
       row.style.background = "#1e3a8a";
@@ -2939,6 +2963,22 @@ function checkSugorokuTitles(code){
   if(laps >= 100){
     giveTitle(code, "sugoroku100");
   }
+}
+
+function createRankCharacter(player){
+
+const div = document.createElement("div");
+div.className = "rankChar";
+
+div.innerHTML = `
+<img src="assets/body/body${player.body||0}.png">
+<img src="assets/legs/legs${player.legs||0}.png">
+<img src="assets/clothes/clothes${player.armor||0}.png">
+<img src="assets/hair/hair${player.hair||0}.png">
+`;
+
+return div;
+
 }
 
 </script>
