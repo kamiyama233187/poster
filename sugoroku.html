@@ -24,6 +24,7 @@ left:0;
 top:0;
 
 object-fit:none;
+object-position:-64px -128px;
 
 image-rendering:pixelated;
 }
@@ -389,8 +390,8 @@ Lv：<span id="level">1</span><br>
     <div id="player" class="player">
 
 <img id="playerBody">
-<img id="playerLegs">
 <img id="playerClothes">
+<img id="playerLegs">
 <img id="playerHair">
 
 </div>
@@ -1010,8 +1011,8 @@ const tileData = tiles[state.sugoroku.position];
 
 if(!tileData) return;
 
-player.style.left = (tileData.x*70+12)+"px";
-player.style.top = (tileData.y*70-8)+"px";
+player.style.left = (tileData.x*70+3)+"px";
+player.style.top = (tileData.y*70-12)+"px";
 
 
 /* ===================
