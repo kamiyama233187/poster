@@ -1417,6 +1417,10 @@ time:new Date().toLocaleTimeString()
 
 });
 
+markAreaDone(area);
+
+renderFacingProgress();
+
 save();
 
 }
@@ -3133,8 +3137,11 @@ if(el) el.classList.add("hidden");
 document.getElementById(id).classList.remove("hidden");
 
 if(id==="empFacing"){
+
 initFacingShelves();
+restoreFacingState();
 renderFacingProgress();
+
 }
 
 }
@@ -3554,10 +3561,19 @@ shelves.forEach(el=>{
 el.onclick=()=>{
 
 const id = el.dataset.id;
+const area = SHELF_AREA[id];
+
+if(isAreaDone(area)){
+
+if(confirm("このエリアは撮影済みです。撮り直しますか？")){
+takeFacingPhoto(id);
+}
+
+return;
+
+}
 
 takeFacingPhoto(id);
-
-el.classList.add("done");
 
 };
 
@@ -3737,6 +3753,46 @@ ${p.done}/${p.total}
 (${p.percent}%)
 
 `;
+
+}
+
+function markAreaDone(area){
+
+const shelves = document.querySelectorAll(".shelf");
+
+shelves.forEach(el=>{
+
+const id = el.dataset.id;
+
+if(SHELF_AREA[id] === area){
+
+el.classList.add("done");
+
+}
+
+});
+
+}
+
+function isAreaDone(area){
+
+const today = todayStr();
+
+const records = state.facing.records[today] || [];
+
+return records.some(r => r.area === area);
+
+}
+
+function restoreFacingState(){
+
+const today = todayStr();
+
+const records = state.facing.records[today] || [];
+
+records.forEach(r=>{
+markAreaDone(r.area);
+});
 
 }
 
