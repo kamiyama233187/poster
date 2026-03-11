@@ -3806,14 +3806,16 @@ placeholder="コメント"
 onchange="setFacingComment(${r.index},this.value)"
 style="width:100%;margin-top:4px"></textarea>
 
+<button onclick="invalidateFacing(${r.index})">
+不正（ポイント取消）
+</button>
+
 `;
 
 container.appendChild(row);
 
 });
-<button onclick="invalidateFacing(${r.index})">
-不正（ポイント取消）
-</button>
+
 }
 
 function setFacingScore(index,val){
@@ -3829,8 +3831,6 @@ if(rec.pointGranted) {
 save();
 return;
 }
-
-const workers = getTodayWorkers();  workers.forEach(code=>{  const emp = state.employees[code];  if(!emp) return;  emp.totalPoints += pt; emp.totalEarned += pt;  });
 
 if(!emp){
 save();
@@ -3864,6 +3864,7 @@ pt=20;
 if(rec.score >=9){
 pt=50;
 }
+const workers = getTodayWorkers();  workers.forEach(code=>{  const emp = state.employees[code];  if(!emp) return;  emp.totalPoints += pt; emp.totalEarned += pt;  });
 
 emp.totalPoints += pt;
 emp.totalEarned += pt;
