@@ -1669,7 +1669,7 @@ if(now.getHours() === 7 && now.getMinutes() === 0){
 
   showEmployee();   // ← 先に画面切り替え
 checkSugorokuTitles(code);
-showFacingFeedback();
+renderFacingFeedback();
 
   if(!isShiftDay()){
     showDQMessage("きょうは やすみのひ だった！");
@@ -3281,18 +3281,32 @@ setInterval(() => {
   const hour = now.getHours();
   const minute = now.getMinutes();
 
-  if(hour === 7 && minute < 2 && !backupDone){
+  if(hour === 7 && minute === 0 && !backupDone){
 
-    backupDone = true; // ← 二重防止
+  backupDone = true;
 
-    autoBackup();
+  autoBackup();
 
-    showDQMessage("あたらしいあさがはじまった！");
+  /* ===== AIデータ 月次バックアップ ===== */
 
-    setTimeout(()=>{
-      location.reload();
-    },2000);
-  }
+  const nowDate = new Date();
+
+  if(nowDate.getDate() === 1){
+
+  exportAIData();
+  clearAIData();
+  cleanOldFacingData();   // ←追加
+
+  console.log("AI月次バックアップ完了");
+
+}
+
+  showDQMessage("あたらしいあさがはじまった！");
+
+  setTimeout(()=>{
+    location.reload();
+  },2000);
+}
 
   // 7:02以降でリセット
   if(hour !== 7){
@@ -3704,23 +3718,35 @@ if(!container) return;
 
 container.innerHTML="";
 
-const today=todayStr();
-const records=state.facing.records[today]||[];
+
+const now = new Date();
+
+const records = Object.entries(state.facing.records)
+  .flatMap(([date,list])=>{
+
+    const diff =
+      (now - new Date(date)) / (1000*60*60*24);
+
+    if(diff > 7) return [];
+
+    return list.map((r,i)=>({
+  ...r,
+  index: date + "_" + i
+}));
+
+  });
 
 /* 撮影者ごとにまとめる */
 
 const groups={};
 
-records.forEach((r,i)=>{
+records.forEach((r)=>{
 
 if(!groups[r.employee]){
 groups[r.employee]=[];
 }
 
-groups[r.employee].push({
-...r,
-index:i
-});
+groups[r.employee].push(r);
 
 });
 
@@ -3803,8 +3829,8 @@ style="width:100%;margin-top:8px;min-height:80px;"
 >${r.comment || ""}</textarea>
 
 <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-  <button onclick="saveFacingReview(${r.index})">保存</button>
-  <button onclick="invalidateFacing(${r.index})">不正（ポイント取消）</button>
+  <button onclick="saveFacingReview('${r.index}')">保存</button>
+<button onclick="invalidateFacing('${r.index}')">不正（ポイント取消）</button>
 </div>
 
 <div style="margin-top:8px; font-size:12px; opacity:0.8;">
@@ -3821,90 +3847,47 @@ container.appendChild(row);
 
 function saveFacingReview(index){
 
-const today = todayStr();
-const rec = state.facing.records[today]?.[index];
+let rec = null;
+
+Object.entries(state.facing.records).forEach(([date,list])=>{
+  list.forEach((r,i)=>{
+    if(date+"_"+i === index){
+      rec = r;
+    }
+  });
+});
 
 if(!rec){
   showDQMessage("評価データが見つかりません");
   return;
 }
 
-const scoreEl = document.getElementById(`score_${index}`);
-const commentEl = document.getElementById(`comment_${index}`);
+const score = document.getElementById("score_"+index).value;
+const comment = document.getElementById("comment_"+index).value;
 
-if(!scoreEl){
-  showDQMessage("評価欄が見つかりません");
-  return;
-}
-
-const val = scoreEl.value;
-
-if(val === ""){
-  showDQMessage("点数を選んでください");
-  return;
-}
-
-rec.comment = commentEl ? commentEl.value : "";
-
-// 初回保存前の点数
 const oldScore = rec.score;
-rec.score = parseInt(val,10);
 
-/* ===== ポイント処理 =====
-   初回評価時のみ付与
-*/
-if(!rec.pointGranted){
+rec.score = score === "" ? null : Number(score);
+rec.comment = comment;
 
-  let pt = 0;
+if(oldScore === null && rec.score !== null){
 
-  if(rec.score <= 3){
-    pt = 0;
-  }else if(rec.score <= 6){
-    pt = 5;
-  }else if(rec.score <= 8){
-    pt = 20;
-  }else{
-    pt = 50;
+  if(rec.image){
+    saveAITrainingData({
+      image:rec.image,
+      score:rec.score,
+      comment:rec.comment,
+      area:rec.area,
+      shelf:rec.shelf,
+      time:rec.time
+    });
   }
 
-  const emp = state.employees[rec.employee];
-  if(emp && pt > 0){
-    emp.totalPoints += pt;
-    emp.totalEarned += pt;
-  }
-
-  rec.pointGranted = true;
-
-  if(rec.score <= 3){
-    showDQMessage("保存した！ 前陳未達成（ポイントなし）");
-  }else{
-    showDQMessage(`保存した！ 評価:${rec.score} → ${pt}pt付与`);
-  }
-
-}else{
-  showDQMessage(`保存した！ 評価:${rec.score}`);
 }
 
 save();
 
-renderFacingReview();
-renderFacingFeedback();
-renderEmployee();
-renderRanking();
-renderEmployeeRanking();
-}
-
-function setFacingScore(index,val){
-  // 保存ボタン方式へ変更したため未使用
-}
-
-function setFacingComment(index,val){
-
-const today=todayStr();
-
-state.facing.records[today][index].comment=val;
-
-save();
+showDQMessage("評価を保存した");
 
 }
 
@@ -3994,22 +3977,33 @@ markAreaDone(r.area);
 
 function showFacingFeedback(){
 
-const today=todayStr();
+const now = new Date();
 
-const records=state.facing.records[today]||[];
+const myRecords = Object.entries(state.facing.records)
+  .flatMap(([date,list])=>{
 
-const my=records.filter(r=>r.employee===currentUser);
+    const diff =
+      (now - new Date(date)) / (1000*60*60*24);
 
-if(!my.length) return;
+    if(diff > 7) return [];
 
-my.forEach(r=>{
+    return list.map((r,i)=>({
+...r,
+index:date+"_"+i
+}));
 
-if(r.score===undefined) return;
+  })
+  .filter(r => r.employee === currentUser && r.score != null);
+
+if(!myRecords.length) return;
+
+myRecords.forEach(r=>{
 
 showDQMessage(
-
-`前陳評価\n${r.area}\n評価:${r.score}\n${r.comment||""}`
-
+`前陳評価
+${r.area}
+評価:${r.score}
+${r.comment||""}`
 );
 
 });
@@ -4025,8 +4019,19 @@ container.innerHTML="";
 
 const records = state.facing.records || {};
 
-const myRecords = Object.values(records)
-  .flat()
+const now = new Date();
+
+const myRecords = Object.entries(records)
+  .flatMap(([date,list])=>{
+
+    const diff =
+      (now - new Date(date)) / (1000*60*60*24);
+
+    if(diff > 7) return [];
+
+    return list;
+
+  })
   .filter(r => r.employee === currentUser && r.score != null);
 
 if(!myRecords.length){
@@ -4075,9 +4080,21 @@ const arr=[];
 
 Object.entries(state.employees).forEach(([code,emp])=>{
 
-currentUser = code;
+const today = todayStr().replace(/-/g,"/");
+const name = emp.shiftName?.trim();
 
-if(isShiftDay()){
+if(!name) return;
+
+// 手動シフト
+if(state.shiftOverrides[name] &&
+   state.shiftOverrides[name][today]){
+arr.push(code);
+return;
+}
+
+// CSVシフト
+if(state.shiftTable[name] &&
+   state.shiftTable[name][today]){
 arr.push(code);
 }
 
@@ -4111,8 +4128,20 @@ showDQMessage("仮達成を記録した");
 
 function invalidateFacing(index){
 
-const today = todayStr();
-const rec = state.facing.records[today][index];
+let rec = null;
+
+Object.entries(state.facing.records).forEach(([date,list])=>{
+  list.forEach((r,i)=>{
+    if(date+"_"+i === index){
+      rec = r;
+    }
+  });
+});
+
+if(!rec){
+  showDQMessage("データが見つかりません");
+  return;
+}
 
 rec.score = 0;
 rec.pointGranted = true;
@@ -4120,6 +4149,111 @@ rec.pointGranted = true;
 showDQMessage("前陳無効にした");
 
 save();
+renderFacingReview();
+
+}
+
+function cleanOldFacingData(){
+
+const now = new Date();
+
+Object.keys(state.facing.records).forEach(date=>{
+
+  const diff =
+    (now - new Date(date)) / (1000*60*60*24);
+
+  if(diff > 30){
+
+    delete state.facing.records[date];
+
+  }
+
+});
+
+save();
+
+}
+
+function saveAITrainingData(data){
+
+const request = indexedDB.open("ShukkinQuestAI",1);
+
+request.onupgradeneeded = function(e){
+
+const db = e.target.result;
+
+if(!db.objectStoreNames.contains("facing")){
+db.createObjectStore("facing",{autoIncrement:true});
+}
+
+};
+
+request.onsuccess = function(e){
+
+const db = e.target.result;
+
+const tx = db.transaction("facing","readwrite");
+
+const store = tx.objectStore("facing");
+
+store.add(data);
+
+};
+
+}
+
+function exportAIData(){
+
+const request = indexedDB.open("ShukkinQuestAI",1);
+
+request.onsuccess = function(e){
+
+const db = e.target.result;
+
+const tx = db.transaction("facing","readonly");
+
+const store = tx.objectStore("facing");
+
+const req = store.getAll();
+
+req.onsuccess = function(){
+
+const data = req.result;
+
+const blob = new Blob(
+[JSON.stringify(data,null,2)],
+{type:"application/json"}
+);
+
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+
+a.href = url;
+a.download = "AI_facing_backup.json";
+a.click();
+
+};
+
+};
+
+}
+
+function clearAIData(){
+
+const request = indexedDB.open("ShukkinQuestAI",1);
+
+request.onsuccess = function(e){
+
+const db = e.target.result;
+
+const tx = db.transaction("facing","readwrite");
+
+const store = tx.objectStore("facing");
+
+store.clear();
+
+};
 
 }
 
