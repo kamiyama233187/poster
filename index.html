@@ -3648,13 +3648,26 @@ if(oldScore === null && rec.score !== null){
 
   if(rec.image){
     saveAITrainingData({
-      image:rec.image,
-      score:rec.score,
-      comment:rec.comment,
-      area:rec.area,
-      shelf:rec.shelf,
-      time:rec.time
-    });
+
+image:rec.image,
+
+score:rec.score,
+
+comment:rec.comment,
+
+area:rec.area,
+
+shelf:rec.shelf,
+
+time:rec.time,
+
+date:todayStr(),
+
+store:"store001",
+
+device:navigator.userAgent
+
+});
   }
 
 }
