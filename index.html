@@ -200,12 +200,15 @@ overflow-y:visible;
 
 /* 上段棚 */
 
+#facingScroll{
+min-width:max-content;
+}
+
 #facingSheet{
 display:grid;
 grid-template-columns:repeat(7,1fr);
 gap:8px;
 margin-top:10px;
-min-width:900px;
 margin-bottom:20px;
 }
 
@@ -492,9 +495,6 @@ max-width:none;
   </div>
 
   <!-- ===== クエストタブ ===== -->
-  <button onclick="takeFacingPhoto('testShelf')">
-前陳テスト撮影
-</button>
   
   <div id="empQuest" class="card">
     <h3>今日のクエスト</h3>
@@ -537,6 +537,10 @@ max-width:none;
 
 <div id="facingProgress"></div>
 
+<!-- 横スクロールエリア -->
+<div id="facingScroll">
+
+<!-- ===== 上段棚 ===== -->
 <div id="facingSheet">
 
 <!-- OP -->
@@ -598,6 +602,7 @@ max-width:none;
 
 </div>
 
+<!-- ===== 下段棚 ===== -->
 <div id="facingBottom">
 
 <div class="shelf wide" data-id="frozen1">冷食①</div>
@@ -615,7 +620,9 @@ max-width:none;
 
 </div>
 
-</div>
+</div> <!-- facingScroll -->
+
+</div> <!-- empFacing -->
 
 <!-- ===== フィードバック ===== -->
 <div id="empFeedback" class="card hidden">
