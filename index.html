@@ -1156,6 +1156,69 @@ softdrink4:"drink"
 
 };
 
+const FACING_SAMPLE = {
+
+  // OP
+  op1:{good:"samples/op1_good.jpg",bad:"samples/op1_bad.jpg"},
+  op2:{good:"samples/op2_good.jpg",bad:"samples/op2_bad.jpg"},
+  op3:{good:"samples/op3_good.jpg",bad:"samples/op3_bad.jpg"},
+  op4:{good:"samples/op4_good.jpg",bad:"samples/op4_bad.jpg"},
+  op5:{good:"samples/op5_good.jpg",bad:"samples/op5_bad.jpg"},
+  op6:{good:"samples/op6_good.jpg",bad:"samples/op6_bad.jpg"},
+  op7:{good:"samples/op7_good.jpg",bad:"samples/op7_bad.jpg"},
+
+  // 米飯
+  rice:{good:"samples/rice_good.jpg",bad:"samples/rice_bad.jpg"},
+
+  // デザート
+  dessert:{good:"samples/dessert_good.jpg",bad:"samples/dessert_bad.jpg"},
+  yogurt:{good:"samples/yogurt_good.jpg",bad:"samples/yogurt_bad.jpg"},
+  milk:{good:"samples/milk_good.jpg",bad:"samples/milk_bad.jpg"},
+  platform1:{good:"samples/platform1_good.jpg",bad:"samples/platform1_bad.jpg"},
+
+  // ポケ
+  poke_snack:{good:"samples/poke_snack_good.jpg",bad:"samples/poke_snack_bad.jpg"},
+  poke_season:{good:"samples/poke_season_good.jpg",bad:"samples/poke_season_bad.jpg"},
+  platform2:{good:"samples/platform2_good.jpg",bad:"samples/platform2_bad.jpg"},
+
+  // NL
+  nl_sweets:{good:"samples/nl_sweets_good.jpg",bad:"samples/nl_sweets_bad.jpg"},
+  nl_original:{good:"samples/nl_original_good.jpg",bad:"samples/nl_original_bad.jpg"},
+  nl_bakery:{good:"samples/nl_bakery_good.jpg",bad:"samples/nl_bakery_bad.jpg"},
+  nl_snack:{good:"samples/nl_snack_good.jpg",bad:"samples/nl_snack_bad.jpg"},
+  rare:{good:"samples/rare_good.jpg",bad:"samples/rare_bad.jpg"},
+
+  // カップ麺
+  soup:{good:"samples/soup_good.jpg",bad:"samples/soup_bad.jpg"},
+  cup:{good:"samples/cup_good.jpg",bad:"samples/cup_bad.jpg"},
+  muji:{good:"samples/muji_good.jpg",bad:"samples/muji_bad.jpg"},
+
+  // 日用品
+  daily1:{good:"samples/daily1_good.jpg",bad:"samples/daily1_bad.jpg"},
+  daily2:{good:"samples/daily2_good.jpg",bad:"samples/daily2_bad.jpg"},
+  daily3:{good:"samples/daily3_good.jpg",bad:"samples/daily3_bad.jpg"},
+  daily4:{good:"samples/daily4_good.jpg",bad:"samples/daily4_bad.jpg"},
+  daily5:{good:"samples/daily5_good.jpg",bad:"samples/daily5_bad.jpg"},
+  book:{good:"samples/book_good.jpg",bad:"samples/book_bad.jpg"},
+
+  // 冷食
+  frozen1:{good:"samples/frozen1_good.jpg",bad:"samples/frozen1_bad.jpg"},
+  frozen2:{good:"samples/frozen2_good.jpg",bad:"samples/frozen2_bad.jpg"},
+  frozen3:{good:"samples/frozen3_good.jpg",bad:"samples/frozen3_bad.jpg"},
+
+  // 酒
+  alcohol1:{good:"samples/alcohol1_good.jpg",bad:"samples/alcohol1_bad.jpg"},
+  alcohol2:{good:"samples/alcohol2_good.jpg",bad:"samples/alcohol2_bad.jpg"},
+  alcohol3:{good:"samples/alcohol3_good.jpg",bad:"samples/alcohol3_bad.jpg"},
+
+  // ソフトドリンク
+  softdrink1:{good:"samples/softdrink1_good.jpg",bad:"samples/softdrink1_bad.jpg"},
+  softdrink2:{good:"samples/softdrink2_good.jpg",bad:"samples/softdrink2_bad.jpg"},
+  softdrink3:{good:"samples/softdrink3_good.jpg",bad:"samples/softdrink3_bad.jpg"},
+  softdrink4:{good:"samples/softdrink4_good.jpg",bad:"samples/softdrink4_bad.jpg"}
+
+};
+
 const FACING_SHELVES = [
 
   {id:"s1", name:"米飯"},
@@ -3429,14 +3492,21 @@ shelves.forEach(el=>{
 
 el.onclick=()=>{
 
-const id = el.dataset.id;
-const area = SHELF_AREA[id];
+  const id = el.dataset.id;
+  const area = SHELF_AREA[id];
 
-if(isAreaDone(area)){
+  if(isAreaDone(area)){
 
-if(confirm("このエリアは撮影済みです。撮り直しますか？")){
-showFacingAction(id);
-}
+    if(confirm("このエリアは撮影済みです。撮り直しますか？")){
+      showSample(id);   // ←変更
+    }
+
+    return;
+  }
+
+  showSample(id);   // ←変更
+
+};
 
 return;
 
@@ -4076,7 +4146,68 @@ store.clear();
 
 }
 
+let selectedShelf = null;
+
+function showSample(shelfId){
+
+  selectedShelf = shelfId;
+
+  const sample = FACING_SAMPLE[shelfId];
+
+  // 見本がなければそのまま撮影
+  if(!sample){
+    showFacingAction(shelfId);
+    return;
+  }
+
+  document.getElementById("sampleTitle").textContent =
+    `見本：${shelfId}`;
+
+  document.getElementById("sampleGood").src = sample.good;
+  document.getElementById("sampleBad").src = sample.bad;
+
+  document.getElementById("sampleModal")
+    .classList.remove("hidden");
+}
+
+function closeSample(){
+  document.getElementById("sampleModal")
+    .classList.add("hidden");
+}
+
+function startFacingAction(){
+  closeSample();
+  showFacingAction(selectedShelf);
+}
+
 </script>
+
+<div id="sampleModal" class="modal hidden">
+  <div class="modalBox">
+
+    <h3 id="sampleTitle">前陳見本</h3>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+
+      <div style="flex:1; text-align:center;">
+        <div style="color:#4ade80;">良い例 👍</div>
+        <img id="sampleGood" style="width:100%; margin-top:6px;">
+      </div>
+
+      <div style="flex:1; text-align:center;">
+        <div style="color:#f87171;">悪い例 👎</div>
+        <img id="sampleBad" style="width:100%; margin-top:6px;">
+      </div>
+
+    </div>
+
+    <div class="modalActions">
+      <button onclick="startFacingAction()">この通りに撮影する</button>
+      <button onclick="closeSample()">閉じる</button>
+    </div>
+
+  </div>
+</div>
 
 <input id="employeeImportFile"
        type="file"
