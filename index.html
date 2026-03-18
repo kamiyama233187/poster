@@ -3486,37 +3486,29 @@ showDQMessage("カメラが使えない");
 
 function initFacingShelves(){
 
-const shelves = document.querySelectorAll(".shelf");
+  const shelves = document.querySelectorAll(".shelf");
 
-shelves.forEach(el=>{
+  shelves.forEach(el=>{
 
-el.onclick=()=>{
+    el.onclick=()=>{
 
-  const id = el.dataset.id;
-  const area = SHELF_AREA[id];
+      const id = el.dataset.id;
+      const area = SHELF_AREA[id];
 
-  if(isAreaDone(area)){
+      if(isAreaDone(area)){
 
-    if(confirm("このエリアは撮影済みです。撮り直しますか？")){
-      showSample(id);   // ←変更
-    }
+        if(confirm("このエリアは撮影済みです。撮り直しますか？")){
+          showSample(id);
+        }
 
-    return;
-  }
+        return;
+      }
 
-  showSample(id);   // ←変更
+      showSample(id);
 
-};
+    };
 
-return;
-
-}
-
-showFacingAction(id);
-
-};
-
-});
+  });
 
 }
 
